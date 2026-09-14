@@ -11,7 +11,7 @@
 <style>
 :root{
   --ink:#EDF1EA; --dim:#6B7266; --green:#B0DD66;
-  --t1:#B0DD66; --t2:#E3B34A; --t3:#5FBCA6; --t4:#D9865A; --t5:#B98FC9;
+  --t1:#4F76CC; --t2:#E3B34A; --t3:#5FBCA6; --t4:#D9865A; --t5:#B0DD66;
   --disp:"Barlow Condensed",Impact,sans-serif;
   --body:"Barlow","Segoe UI",Calibri,system-ui,sans-serif;
 }
@@ -157,7 +157,7 @@ button{font-family:inherit;color:inherit;cursor:pointer}
   <section class="scene" data-s="9">
     <div class="mid rise" style="margin-bottom:4vmin">The Format</div>
     <div class="slab">
-      <div class="s rise d1"><div class="v tnum">29</div><div class="k">Cards</div></div>
+      <div class="s rise d1"><div class="v tnum">30</div><div class="k">Cards</div></div>
       <div class="s rise d2"><div class="v tnum">6</div><div class="k">Rounds</div></div>
       <div class="s rise d3"><div class="v tnum">60</div><div class="k">Seconds a pick</div></div>
       <div class="s rise d4"><div class="v">0</div><div class="k">Trades</div></div>
@@ -231,15 +231,16 @@ SCHOOLS.forEach((s,i)=>{
 });
 const run=document.getElementById("run");
 const items=SCHOOLS.map(s=>'<i><b>'+s.n.toUpperCase()+'</b></i>').join("")
-  +'<i>29 cards</i><i>6 rounds</i><i>60 seconds a pick</i><i>No trades</i><i><b>Captains draft blind</b></i>';
+  +'<i>30 cards</i><i>6 rounds</i><i>60 seconds a pick</i><i>No trades</i><i><b>Captains draft blind</b></i>';
 run.innerHTML=items+items;
 
 /* timeline: [sceneIndex, holdMs] */
-const SCHOOL_HOLD=10000;
-const T=[[0,1150],[1,1500],[2,1900],[3,1450],
-  [4,SCHOOL_HOLD],[5,SCHOOL_HOLD],[6,SCHOOL_HOLD],[7,SCHOOL_HOLD],[8,SCHOOL_HOLD],
-  [9,2100],[10,1700],[11,1900],
-  [12,650],[13,650],[14,650],[15,0]];
+const HOLD=10000;              // every content slide from the conference reveal on
+const T=[[0,1150],[1,1500],
+  [2,HOLD],[3,HOLD],
+  [4,HOLD],[5,HOLD],[6,HOLD],[7,HOLD],[8,HOLD],
+  [9,HOLD],[10,HOLD],[11,HOLD],
+  [12,700],[13,700],[14,700],[15,0]];
 let timer=null, idx=0;
 const scenes=()=>[...stage.querySelectorAll(".scene")];
 
@@ -257,8 +258,13 @@ function step(k){
   if(k>=T.length)return;
   idx=k; show(T[k][0]);
   const hold=T[k][1];
-  const sc=stage.querySelector('[data-s="'+T[k][0]+'"] .tick');
-  if(sc) sc.style.setProperty('--hold',hold+'ms');
+  const el=stage.querySelector('[data-s="'+T[k][0]+'"]');
+  if(el && hold>=3000){
+    let sc=el.querySelector(".tick");
+    if(!sc){ sc=document.createElement("div"); sc.className="tick"; el.appendChild(sc); }
+    sc.style.setProperty('--hold',hold+'ms');
+    sc.style.animation="none"; void sc.offsetWidth; sc.style.animation="";
+  }
   if(hold>0) timer=setTimeout(()=>step(k+1),hold);
   else document.getElementById("ctl").classList.add("show");
 }

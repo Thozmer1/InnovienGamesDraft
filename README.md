@@ -50,6 +50,23 @@ Click "Commit changes" at the bottom.
 4. Vercel auto-detects a static site. **Change nothing.** Click "Deploy"
 5. About 30 seconds later you get a URL like `innovien-games-draft.vercel.app`
 
+## The broadcast open
+
+`intro.html` deploys alongside the board and lives at `<your-url>/intro`. It is a
+full-screen open of about **1 minute 45**: conference reveal, the five schools in team colours, the format, a countdown, then it holds on a title card so you can talk
+over it while people settle.
+
+It has **no audio**. Start a track before you hit play.
+
+No captain names appear anywhere in it, you announce those as the board opens.
+Every content slide from the conference reveal onward holds for **10 seconds**, with a thin progress
+line along the bottom. You are not stuck with that pace: **Space** or **right arrow**
+moves on early, **left arrow** goes back.
+
+Keys: **F** full screen, **R** replay, **S** skip to the end card, **Esc** to leave
+full screen. Open `/intro` in one tab and the board in another, run the open, then
+switch tabs.
+
 ## Running the draft on it
 
 1. Open the URL on the conference room PC, full screen (F11)
