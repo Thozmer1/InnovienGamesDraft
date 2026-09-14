@@ -56,8 +56,8 @@ button{font-family:inherit;color:inherit;cursor:pointer}
 .flashbar{position:absolute;inset:0;background:var(--green);animation:flash .32s ease-out both}
 
 /* school card */
-.school{position:relative;width:100%;max-width:1300px;padding:16vmin 4vmin 0}
-.school .bar{height:10px;background:var(--c);margin:0 auto 3.2vmin;--w:min(72vw,900px);
+.school{position:relative;width:100%;max-width:1300px;padding:14vmin 4vmin 0}
+.school .bar{height:10px;background:var(--c);margin:0 auto 4vmin;--w:min(72vw,900px);
   animation:barGrow .38s cubic-bezier(.6,0,.2,1) both}
 .school .nm{color:var(--c)}
 .school .cap{margin-top:2.4vmin;font-family:var(--body);font-weight:600;
@@ -66,6 +66,10 @@ button{font-family:inherit;color:inherit;cursor:pointer}
 .school .idx{position:absolute;top:-16vmin;left:50%;transform:translateX(-50%);
   font-family:var(--disp);font-weight:700;font-size:clamp(38px,7vw,104px);
   color:var(--c);opacity:.22;line-height:1;letter-spacing:.06em}
+
+.tick{position:absolute;left:0;bottom:0;height:4px;background:var(--c);opacity:.5;
+  width:0;animation:tickGrow var(--hold,10s) linear both}
+@keyframes tickGrow{from{width:0}to{width:100%}}
 
 /* stat slab */
 .slab{display:grid;grid-template-columns:repeat(4,1fr);gap:2.4vmin;width:min(92vw,1250px)}
@@ -202,7 +206,7 @@ button{font-family:inherit;color:inherit;cursor:pointer}
   <div class="big" style="color:var(--green)">Big I Conference</div>
   <button class="btn pri" id="play">Play the open</button>
   <p class="hint">Runs about <b>22 seconds</b>, then holds on the title card so you can talk over it.
-    Press <b>F</b> for full screen, <b>R</b> to replay, <b>Esc</b> to leave full screen.
+    Each school card holds <b>10 seconds</b>. Press <b>Space</b> or <b>&rarr;</b> to move on early, <b>&larr;</b> to go back, <b>F</b> for full screen, <b>R</b> to replay, <b>S</b> to skip to the end.
     Start your music first, this has no audio of its own.</p>
 </div>
 
@@ -221,18 +225,19 @@ SCHOOLS.forEach((s,i)=>{
   el.className="scene"; el.dataset.s=String(4+i);
   el.innerHTML='<div class="school"><div class="idx">0'+(i+1)+'</div>'+
     '<div class="bar" style="--c:'+s.c+'"></div>'+
-    '<div class="big nm slam d1" style="--c:'+s.c+'">'+s.n+'</div>'+
-    '<div class="cap rise d3"><span>Captain</span> &nbsp;'+s.cap+'</div></div>';
+    '<div class="big nm slam d1" style="--c:'+s.c+'">'+s.n+'</div></div>'+
+    '<div class="tick" style="--c:'+s.c+'"></div>';
   stage.insertBefore(el,anchor);
 });
 const run=document.getElementById("run");
-const items=SCHOOLS.map(s=>'<i>'+s.n.replace(" University","").toUpperCase()+' <b>'+s.cap+'</b></i>').join("")
-  +'<i>29 cards</i><i>6 rounds</i><i>60 seconds a pick</i><i><b>No trades</b></i>';
+const items=SCHOOLS.map(s=>'<i><b>'+s.n.toUpperCase()+'</b></i>').join("")
+  +'<i>29 cards</i><i>6 rounds</i><i>60 seconds a pick</i><i>No trades</i><i><b>Captains draft blind</b></i>';
 run.innerHTML=items+items;
 
 /* timeline: [sceneIndex, holdMs] */
+const SCHOOL_HOLD=10000;
 const T=[[0,1150],[1,1500],[2,1900],[3,1450],
-  [4,1200],[5,1200],[6,1200],[7,1200],[8,1200],
+  [4,SCHOOL_HOLD],[5,SCHOOL_HOLD],[6,SCHOOL_HOLD],[7,SCHOOL_HOLD],[8,SCHOOL_HOLD],
   [9,2100],[10,1700],[11,1900],
   [12,650],[13,650],[14,650],[15,0]];
 let timer=null, idx=0;
@@ -243,7 +248,7 @@ function show(i){
   const el=stage.querySelector('[data-s="'+i+'"]');
   if(!el)return;
   // retrigger the CSS animations on every entry
-  el.querySelectorAll(".slam,.rise,.wedge,.rule,.bar,.flashbar").forEach(n=>{
+  el.querySelectorAll(".slam,.rise,.wedge,.rule,.bar,.flashbar,.tick").forEach(n=>{
     const a=n.style.animation; n.style.animation="none"; void n.offsetWidth; n.style.animation=a;
   });
   el.classList.add("on");
@@ -252,6 +257,8 @@ function step(k){
   if(k>=T.length)return;
   idx=k; show(T[k][0]);
   const hold=T[k][1];
+  const sc=stage.querySelector('[data-s="'+T[k][0]+'"] .tick');
+  if(sc) sc.style.setProperty('--hold',hold+'ms');
   if(hold>0) timer=setTimeout(()=>step(k+1),hold);
   else document.getElementById("ctl").classList.add("show");
 }
@@ -279,6 +286,12 @@ document.addEventListener("keydown",e=>{
     if(!document.getElementById("gate").classList.contains("hide")){e.preventDefault();full();start()}
   }
   if(k==="s"){e.preventDefault();skip()}
+  if((k===" "||k==="arrowright")&&document.getElementById("gate").classList.contains("hide")){
+    e.preventDefault(); clearTimeout(timer); if(idx<T.length-1) step(idx+1);
+  }
+  if(k==="arrowleft"&&document.getElementById("gate").classList.contains("hide")){
+    e.preventDefault(); clearTimeout(timer); if(idx>0) step(idx-1);
+  }
 });
 </script>
 </body>
