@@ -1,0 +1,1006 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<meta name="robots" content="noindex,nofollow,noarchive">
+<meta name="color-scheme" content="dark">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Ctext y='.9em' font-size='90'%3E%F0%9F%8F%86%3C/text%3E%3C/svg%3E">
+<title>Innovien Games Draft Room</title>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@500;600;700&family=Barlow:wght@400;500;600;700&display=swap">
+<style>
+:root{
+  --ground:#0F1210; --panel:#171B16; --panel2:#1E231C; --line:#2C3229; --line2:#3A4136;
+  --ink:#EDF1EA; --muted:#8E9589; --dim:#666C61;
+  --green:#B0DD66; --amber:#E3B34A;
+  --disp:"Barlow Condensed",Impact,sans-serif;
+  --body:"Barlow","Segoe UI",Calibri,system-ui,sans-serif;
+}
+*{box-sizing:border-box}
+body{margin:0;background:var(--ground);color:var(--ink);font-family:var(--body);font-size:14px;-webkit-font-smoothing:antialiased}
+button{font-family:inherit;font-size:inherit;color:inherit;cursor:pointer}
+input,select{font-family:inherit;font-size:inherit}
+:focus-visible{outline:2px solid var(--green);outline-offset:2px}
+.tnum{font-variant-numeric:tabular-nums}
+
+.app{display:flex;flex-direction:column;height:100vh;min-height:620px}
+header{display:flex;align-items:center;gap:18px;padding:0 16px;height:56px;flex:0 0 auto;
+  background:var(--panel);border-bottom:1px solid var(--line)}
+.brand .mark{font-family:var(--disp);font-weight:700;font-size:21px;letter-spacing:.06em;text-transform:uppercase}
+.brand .mark em{font-style:normal;color:var(--green)}
+.brand .sub{font-family:var(--disp);font-weight:500;font-size:12px;letter-spacing:.16em;
+  text-transform:uppercase;color:var(--muted);margin-left:9px}
+nav{display:flex;gap:2px;margin-left:auto}
+nav button{background:none;border:0;padding:8px 13px;border-radius:4px;font-family:var(--disp);
+  font-weight:600;font-size:14px;letter-spacing:.12em;text-transform:uppercase;color:var(--muted)}
+nav button:hover{color:var(--ink);background:var(--panel2)}
+nav button[aria-current="true"]{color:var(--ground);background:var(--green)}
+.hdr-right{display:flex;align-items:center;gap:10px}
+.sync{display:flex;align-items:center;gap:6px;font-size:10px;letter-spacing:.1em;text-transform:uppercase;color:var(--dim)}
+.dot{width:7px;height:7px;border-radius:50%;background:var(--dim)}
+.dot.live{background:var(--green);box-shadow:0 0 0 3px rgba(176,221,102,.16)}
+.dot.local{background:var(--amber)}
+.tgl{display:flex;align-items:center;gap:7px;padding:6px 10px;border:1px solid var(--line2);
+  border-radius:4px;background:none;font-size:10px;letter-spacing:.1em;text-transform:uppercase;color:var(--muted)}
+.tgl[aria-pressed="true"]{border-color:var(--green);color:var(--green)}
+#presentBtn[aria-pressed="true"]{border-color:var(--amber);color:var(--amber)}
+#presentBtn[aria-pressed="true"] .sw{background:rgba(227,179,74,.3)}
+#presentBtn[aria-pressed="true"] .sw::after{background:var(--amber)}
+.masked{color:var(--dim);font-style:italic;letter-spacing:.06em}
+.tgl .sw{width:20px;height:11px;border-radius:6px;background:var(--line2);position:relative;transition:background .15s}
+.tgl .sw::after{content:"";position:absolute;top:2px;left:2px;width:7px;height:7px;border-radius:50%;
+  background:var(--muted);transition:transform .15s,background .15s}
+.tgl[aria-pressed="true"] .sw{background:rgba(176,221,102,.3)}
+.tgl[aria-pressed="true"] .sw::after{transform:translateX(9px);background:var(--green)}
+
+main{flex:1 1 auto;min-height:0;overflow:hidden}
+.view{display:none;height:100%}
+.view.on{display:flex;flex-direction:column}
+
+/* clock strip */
+.strip{flex:0 0 auto;display:grid;grid-template-columns:auto 1fr auto auto;align-items:center;gap:22px;
+  padding:12px 18px;background:linear-gradient(180deg,var(--panel2),var(--panel));border-bottom:1px solid var(--line)}
+.pickno{display:flex;flex-direction:column;padding-right:20px;border-right:1px solid var(--line2)}
+.k{font-size:10px;letter-spacing:.18em;text-transform:uppercase;color:var(--dim)}
+.pickno .v{font-family:var(--disp);font-weight:700;font-size:28px;line-height:1}
+.onclock .k2{font-size:10px;letter-spacing:.22em;text-transform:uppercase;color:var(--green);margin-bottom:2px}
+.onclock .team{font-family:var(--disp);font-weight:700;font-size:33px;line-height:1;display:flex;align-items:center;gap:11px}
+.onclock .chip{width:13px;height:24px;border-radius:2px;flex:0 0 auto}
+.onclock .cap{font-size:12px;color:var(--muted);margin-top:3px}
+.clockbox{text-align:right}
+.clockbox .t{font-family:var(--disp);font-weight:700;font-size:42px;line-height:1}
+.clockbox.warn .t{color:var(--amber)}
+.clockbox.out .t{color:var(--amber);animation:pulse 1s steps(2,end) infinite}
+@keyframes pulse{50%{opacity:.3}}
+.ctl{display:flex;gap:6px}
+.btn{padding:8px 13px;border:1px solid var(--line2);border-radius:4px;background:var(--panel2);
+  font-family:var(--disp);font-weight:600;font-size:13px;letter-spacing:.1em;text-transform:uppercase;color:var(--ink)}
+.btn:hover{border-color:var(--muted)}
+.btn.pri{background:var(--green);border-color:var(--green);color:#12170D}
+.btn.pri:hover{background:#c2e87f}
+.btn.ghost{background:none;color:var(--muted)}
+.btn:disabled{opacity:.32;cursor:not-allowed}
+.btn.sm{padding:5px 9px;font-size:11px}
+.btn.big{padding:13px 26px;font-size:17px;letter-spacing:.14em}
+
+/* board */
+.board{flex:1 1 auto;min-height:0;display:grid;grid-template-columns:1fr 300px}
+.gridwrap{display:flex;flex-direction:column;min-height:0}
+.gbar{flex:0 0 auto;display:flex;align-items:center;gap:12px;padding:9px 16px;
+  border-bottom:1px solid var(--line);background:var(--panel)}
+.gbar h2{margin:0;font-family:var(--disp);font-weight:700;font-size:14px;letter-spacing:.14em;text-transform:uppercase}
+.gbar .ct{font-family:var(--disp);font-size:16px;color:var(--green)}
+.srch{width:210px;padding:6px 9px;border:1px solid var(--line2);border-radius:4px;background:var(--ground);color:var(--ink)}
+.srch::placeholder{color:var(--dim)}
+.gbar .sizes{margin-left:auto;display:flex;gap:3px}
+.gbar .sz{padding:4px 10px;border:1px solid var(--line2);border-radius:4px;background:none;
+  font-size:10px;letter-spacing:.1em;text-transform:uppercase;color:var(--muted)}
+.gbar .sz[aria-pressed="true"]{background:var(--green);border-color:var(--green);color:#12170D}
+
+.grid{flex:1 1 auto;overflow-y:auto;padding:14px;display:grid;align-content:start;
+  gap:var(--gap,11px);grid-template-columns:repeat(auto-fill,minmax(var(--tile,216px),1fr))}
+.tile{display:flex;flex-direction:column;gap:6px;text-align:left;padding:11px 12px 12px;
+  background:var(--panel);border:1px solid var(--line);border-top:3px solid var(--line2);
+  border-radius:6px;min-height:150px;transition:transform .1s,border-color .1s}
+.tile:hover{border-color:var(--green);border-top-color:var(--green);transform:translateY(-2px)}
+.tile:hover .no{color:var(--green)}
+.tile .no{font-family:var(--disp);font-weight:700;font-size:var(--nosz,30px);line-height:.9;
+  color:var(--muted);transition:color .1s}
+.tile .l1{display:block;font-size:var(--t1sz,13px);line-height:1.3}
+.tile .l1>span{display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;
+  overflow:hidden;height:2.6em}
+.tile .l2{display:block;margin-top:auto;padding-top:7px;border-top:1px solid var(--line);
+  font-size:var(--t2sz,11.5px);line-height:1.3;color:var(--muted)}
+.tile .l2>span{display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;
+  overflow:hidden;height:2.6em;font-style:italic}
+.tile .l1>b,.tile .l2>b{display:block;font-size:var(--lbsz,9px);font-weight:600;
+  letter-spacing:.14em;text-transform:uppercase;color:var(--dim);margin-bottom:2px;font-style:normal}
+.tile .l1>b{color:var(--green);opacity:.7}
+.tile:hover .l1>b{opacity:1}
+.tile.taken .l1>b,.tile.taken .l2>b{display:none}
+.tile.blank .l1>span{color:var(--dim);font-style:italic}
+.tile.taken{border-top-color:var(--tc);background:var(--ground);cursor:default}
+.tile.taken:hover{transform:none;border-color:var(--line);border-top-color:var(--tc)}
+.tile.taken .no{color:var(--tc)}
+.tile.taken .l1,.tile.taken .l2{display:none}
+.tile.taken .who{font-family:var(--disp);font-weight:700;font-size:var(--whosz,19px);
+  line-height:1.05;text-transform:uppercase}
+.tile.taken .to{font-size:11px;color:var(--tc);letter-spacing:.06em}
+.tile .who,.tile .to{display:none}
+.tile.taken .who,.tile.taken .to{display:block}
+.empty{padding:26px 14px;text-align:center;color:var(--dim);font-size:13px;grid-column:1/-1}
+
+/* teams rail */
+.right{border-left:1px solid var(--line);display:flex;flex-direction:column;min-height:0;background:var(--panel)}
+.colhd{padding:10px 12px;border-bottom:1px solid var(--line);display:flex;
+  align-items:baseline;justify-content:space-between;flex:0 0 auto}
+.colhd h2{margin:0;font-family:var(--disp);font-weight:700;font-size:14px;letter-spacing:.14em;text-transform:uppercase}
+.colhd .ct{font-family:var(--disp);font-size:15px;color:var(--green)}
+.scroll{flex:1 1 auto;overflow-y:auto;padding:7px}
+
+.tm{background:var(--panel2);border:1px solid var(--line);border-left:3px solid var(--tc);
+  border-radius:5px;margin-bottom:7px;overflow:hidden}
+.tm.active{border-color:var(--tc);box-shadow:0 0 0 1px var(--tc)}
+.tm-hd{padding:7px 10px;display:grid;grid-template-columns:1fr auto;gap:0 8px;align-items:baseline}
+.tm-hd .nm{grid-area:1/1;font-family:var(--disp);font-weight:700;font-size:17px;letter-spacing:.03em;
+  text-transform:uppercase;color:var(--tc);line-height:1.1}
+.tm-hd .ct{grid-area:1/2;font-family:var(--disp);font-size:16px;color:var(--dim)}
+.tm ul{list-style:none;margin:0;padding:0 6px 6px;display:flex;flex-direction:column;gap:1px}
+.tm li{display:grid;grid-template-columns:32px 1fr;gap:7px;align-items:baseline;
+  padding:3px 5px;border-radius:3px;font-size:12.5px}
+.tm li:nth-child(odd){background:rgba(255,255,255,.02)}
+.tm li .n{font-family:var(--disp);font-size:11px;color:var(--dim)}
+.tm li .who{font-weight:600}
+.tm li.caprow .n{color:var(--tc);font-weight:700}
+.tm li.caprow{background:rgba(255,255,255,.05)!important}
+.tm li.caprow i{color:var(--dim)}
+.tm .none{padding:3px 11px 8px;font-size:11.5px;color:var(--dim);font-style:italic}
+
+/* card modal, two stages */
+.modal{position:fixed;inset:0;z-index:55;display:none;align-items:center;justify-content:center;
+  background:rgba(9,11,9,.93);padding:24px}
+.modal.on{display:flex}
+.bigcard{width:100%;max-width:720px;max-height:calc(100vh - 48px);display:flex;flex-direction:column;
+  background:var(--panel);border:1px solid var(--line);border-top:5px solid var(--tc,var(--green));
+  border-radius:8px;overflow:hidden}
+.bc-hd{padding:16px 22px 13px;display:flex;align-items:flex-start;justify-content:space-between;
+  gap:16px;border-bottom:1px solid var(--line);flex:0 0 auto}
+.bc-no{font-family:var(--disp);font-weight:700;font-size:58px;line-height:.85;color:var(--tc,var(--green))}
+.bc-no small{display:block;font-size:11px;letter-spacing:.2em;color:var(--dim);font-weight:600}
+.bc-nick{text-align:right}
+.bc-nick .v{font-family:var(--disp);font-weight:700;font-size:24px;line-height:1.05;text-transform:uppercase}
+.bc-body{padding:4px 22px 16px;overflow-y:auto;flex:1 1 auto}
+.fx{padding:11px 0;border-bottom:1px solid var(--line)}
+.fx:last-child{border-bottom:0}
+.fx .k{display:block;margin-bottom:3px;color:var(--tc,var(--green))}
+.fx .v{font-size:15.5px;line-height:1.5;white-space:pre-wrap}
+.bc-foot{flex:0 0 auto;padding:13px 22px;border-top:1px solid var(--line);
+  display:flex;gap:10px;align-items:center;background:var(--panel2)}
+.bc-foot .note{font-size:12px;color:var(--muted);margin-left:auto;text-align:right}
+
+/* captains */
+.capgrid{display:grid;grid-template-columns:repeat(auto-fit,minmax(300px,1fr));gap:14px}
+.capcard{background:var(--panel);border:1px solid var(--line);border-top:5px solid var(--tc);
+  border-radius:8px;padding:16px 18px;display:flex;flex-direction:column;gap:10px}
+.capcard .top{display:flex;align-items:flex-start;justify-content:space-between;gap:12px}
+.capcard .tmlbl{font-family:var(--disp);font-weight:700;font-size:13px;letter-spacing:.16em;
+  text-transform:uppercase;color:var(--tc)}
+.capcard .nm{font-family:var(--disp);font-weight:700;font-size:31px;line-height:1;text-transform:uppercase;margin-top:2px}
+.capcard .nk{font-family:var(--disp);font-weight:700;font-size:15px;text-transform:uppercase;
+  color:var(--tc);text-align:right;line-height:1.15;max-width:44%}
+.capcard .quote{font-size:16px;line-height:1.45;font-style:italic;padding:9px 0 9px 13px;
+  border-left:3px solid var(--tc)}
+.capcard .rows{display:flex;flex-direction:column;gap:8px}
+.capcard .r{font-size:13px;line-height:1.45}
+.capcard .r b{display:block;font-size:9.5px;letter-spacing:.13em;text-transform:uppercase;
+  color:var(--muted);font-weight:600;margin-bottom:1px}
+.capcard .miss{font-size:13px;color:var(--dim);font-style:italic}
+
+/* captain present overlay */
+.pres{position:fixed;inset:0;z-index:60;display:none;flex-direction:column;
+  background:rgba(9,11,9,.97);padding:32px 28px}
+.pres.on{display:flex}
+.pres .body{flex:1 1 auto;display:flex;flex-direction:column;justify-content:center;
+  align-items:center;text-align:center;max-width:940px;margin:0 auto;width:100%;overflow-y:auto}
+.pres .tmlbl{font-family:var(--disp);font-size:clamp(14px,2vw,20px);letter-spacing:.32em;text-transform:uppercase}
+.pres .nm{font-family:var(--disp);font-weight:700;font-size:clamp(42px,8.5vw,104px);line-height:.98;
+  text-transform:uppercase;margin:4px 0}
+.pres .nk{font-family:var(--disp);font-weight:700;font-size:clamp(18px,3vw,32px);
+  letter-spacing:.06em;text-transform:uppercase;color:var(--muted)}
+.pres .quote{font-size:clamp(18px,2.6vw,30px);line-height:1.35;font-style:italic;margin:22px auto 0;max-width:22ch}
+.pres .rows{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:16px;
+  margin-top:26px;width:100%;text-align:left}
+.pres .r{font-size:clamp(13px,1.4vw,16px);line-height:1.45}
+.pres .r b{display:block;font-size:10px;letter-spacing:.16em;text-transform:uppercase;
+  color:var(--muted);font-weight:600;margin-bottom:2px}
+.pres .bar{flex:0 0 auto;display:flex;align-items:center;justify-content:center;gap:12px;padding-top:18px}
+.pres .dots{display:flex;gap:7px;margin:0 10px}
+.pres .dots i{width:9px;height:9px;border-radius:50%;background:var(--line2);display:block}
+.pres .dots i.on{background:var(--green)}
+
+/* reveal */
+.reveal{position:fixed;inset:0;z-index:50;display:none;align-items:center;justify-content:center;
+  background:rgba(9,11,9,.94);padding:24px;text-align:center}
+.reveal.on{display:flex}
+.reveal .in{max-width:760px}
+.reveal .pk{font-family:var(--disp);font-size:15px;letter-spacing:.3em;text-transform:uppercase;color:var(--green)}
+.reveal .cd{font-family:var(--disp);font-weight:700;font-size:clamp(40px,9vw,96px);line-height:.95;color:var(--line2);margin:6px 0 4px}
+.reveal .nm{font-family:var(--disp);font-weight:700;font-size:clamp(44px,10vw,110px);line-height:.98;
+  letter-spacing:.01em;text-transform:uppercase;animation:pop .45s cubic-bezier(.2,1.4,.4,1)}
+@keyframes pop{from{transform:scale(.86);opacity:0}to{transform:scale(1);opacity:1}}
+.reveal .mt{margin-top:12px;font-size:17px;color:var(--muted)}
+.reveal .to{margin-top:22px;font-family:var(--disp);font-size:26px;letter-spacing:.08em;text-transform:uppercase}
+.reveal .x{margin-top:26px}
+
+/* panes */
+.pane{flex:1 1 auto;overflow-y:auto;padding:20px 22px 60px}
+.pane-in{max-width:1100px;margin:0 auto;display:flex;flex-direction:column;gap:20px}
+h3.sec{margin:0 0 2px;font-family:var(--disp);font-weight:700;font-size:16px;letter-spacing:.14em;text-transform:uppercase}
+.hint{margin:0;font-size:13px;color:var(--muted);max-width:78ch;line-height:1.55}
+.card{background:var(--panel);border:1px solid var(--line);border-radius:6px;padding:15px 17px}
+.warnbox{border:1px solid var(--amber);border-radius:5px;padding:11px 14px;font-size:13px;color:var(--amber);line-height:1.55}
+table{width:100%;border-collapse:collapse;font-size:13px}
+th{text-align:left;font-family:var(--disp);font-weight:600;font-size:11px;letter-spacing:.14em;
+  text-transform:uppercase;color:var(--muted);padding:7px 8px;border-bottom:1px solid var(--line2);white-space:nowrap}
+td{padding:5px 8px;border-bottom:1px solid var(--line);vertical-align:top}
+tbody tr:hover{background:var(--panel2)}
+.tbl-wrap{overflow-x:auto}
+.pill{display:inline-block;font-size:10px;letter-spacing:.08em;text-transform:uppercase;padding:2px 7px;
+  border-radius:3px;border:1px solid var(--line2);color:var(--muted);white-space:nowrap}
+.pill.in{color:var(--green);border-color:rgba(176,221,102,.4)}
+.pill.out{color:var(--dim)}
+.pill.maybe,.pill.noreply{color:var(--amber);border-color:rgba(227,179,74,.4)}
+.fields{display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:13px}
+label.f{display:flex;flex-direction:column;gap:5px;font-size:11px;letter-spacing:.12em;text-transform:uppercase;color:var(--muted)}
+label.f input,label.f select{padding:7px 9px;border:1px solid var(--line2);border-radius:4px;
+  background:var(--ground);color:var(--ink);font-size:14px;letter-spacing:0;text-transform:none}
+.teamrow{display:grid;grid-template-columns:30px 1fr 1fr 28px;gap:9px;align-items:center;padding:6px 0;border-bottom:1px solid var(--line)}
+.teamrow:last-child{border-bottom:0}
+.swatch{width:24px;height:24px;border-radius:4px;border:1px solid rgba(255,255,255,.14)}
+.teamrow input{padding:6px 9px;border:1px solid var(--line2);border-radius:4px;background:var(--ground);color:var(--ink)}
+.ord{font-family:var(--disp);font-size:15px;color:var(--dim);text-align:center}
+.actions{display:flex;flex-wrap:wrap;gap:8px;align-items:center}
+
+/* print cards */
+.cardgrid{display:grid;grid-template-columns:repeat(auto-fill,minmax(250px,1fr));gap:11px}
+.pc{background:var(--panel);border:1px solid var(--line);border-top:3px solid var(--green);border-radius:6px;
+  padding:11px 13px;display:flex;flex-direction:column;gap:7px}
+.pc .hd{display:flex;align-items:baseline;justify-content:space-between;gap:8px}
+.pc .no{font-family:var(--disp);font-weight:700;font-size:28px;line-height:1;color:var(--green)}
+.pc .nk{font-family:var(--disp);font-weight:700;font-size:15px;text-transform:uppercase;text-align:right;line-height:1.1}
+.pc .r{font-size:11.5px;line-height:1.4}
+.pc .r b{display:block;font-size:9px;letter-spacing:.12em;text-transform:uppercase;color:var(--muted);font-weight:600}
+.pc .rev{margin-top:auto;padding-top:7px;border-top:1px dashed var(--line2);font-size:11px;color:var(--dim)}
+
+@media print{
+  body{background:#fff;color:#000}
+  header,.strip,.noprint,.reveal{display:none!important}
+  .app{height:auto;display:block}
+  .view{display:none!important}.view.on{display:block!important}
+  .pane{overflow:visible;padding:0}
+  .cardgrid{grid-template-columns:repeat(2,1fr);gap:8px}
+  .pc{background:#fff;border:1px solid #888;border-top:3px solid #7FA842;break-inside:avoid;page-break-inside:avoid}
+  .capgrid{grid-template-columns:repeat(2,1fr)}
+  .capcard{background:#fff;border:1px solid #888;break-inside:avoid;page-break-inside:avoid}
+  .capcard .nm{color:#000}.capcard .quote,.capcard .r{color:#111}.capcard .r b{color:#555}
+  .pc .no{color:#5E7F30}.pc .nk{color:#000}.pc .r{color:#111}.pc .r b{color:#555}
+  .pc .rev{color:#666}
+}
+@media (max-width:1100px){.board{grid-template-columns:236px 1fr}.right{display:none}}
+@media (max-width:760px){
+  .board{grid-template-columns:1fr;grid-template-rows:auto 1fr}
+  .left{border-right:0;border-bottom:1px solid var(--line);max-height:34vh}
+  .strip{grid-template-columns:1fr;gap:10px}.clockbox{text-align:left}
+}
+@media (prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}}
+</style>
+<style>html,body{margin:0;padding:0}img{max-width:100%}[hidden]{display:none!important}</style>
+</head>
+<body>
+<div class="app">
+  <header>
+    <div class="brand"><span class="mark">Innovien <em>Games</em></span><span class="sub">Big I Conference &middot; Sept 16</span></div>
+    <nav>
+      <button data-v="board" aria-current="true">Board</button>
+      <button data-v="captains">Captains</button>
+      <button data-v="cards">Cards</button>
+      <button data-v="roster">Roster</button>
+      <button data-v="setup">Setup</button>
+    </nav>
+    <div class="hdr-right">
+      <span class="sync"><span class="dot" id="dot"></span><span id="syncTxt">local</span></span>
+      <button class="tgl" id="nickBtn" aria-pressed="false" title="Many nicknames give away who the person is"><span class="sw"></span>Nicknames</button>
+      <button class="tgl" id="presentBtn" aria-pressed="false" title="Hides every name-to-card mapping so screen sharing cannot spoil the draft"><span class="sw"></span>Presenting</button>
+      <button class="tgl" id="commishBtn" aria-pressed="false"><span class="sw"></span>Commissioner</button>
+    </div>
+  </header>
+
+  <main>
+    <!-- BOARD -->
+    <section class="view on" id="v-board">
+      <div class="strip" id="strip">
+        <div class="pickno"><span class="k">Round / Pick</span><span class="v tnum" id="pickNo">1.01</span></div>
+        <div class="onclock">
+          <div class="k2" id="clockLabel">On the clock</div>
+          <div class="team"><span class="chip" id="ocChip"></span><span id="ocTeam">Team 1</span></div>
+          <div class="cap" id="ocCap"></div>
+        </div>
+        <div class="clockbox" id="clockBox"><div class="t tnum" id="clockT">1:00</div><div class="k">Pick clock</div></div>
+        <div class="ctl" id="boardCtl">
+          <button class="btn" id="btnClock">Start</button>
+          <button class="btn ghost" id="btnUndo">Undo</button>
+        </div>
+      </div>
+
+      <div class="board">
+        <div class="gridwrap">
+          <div class="gbar">
+            <h2>The board</h2><span class="ct tnum" id="availCt">0</span>
+            <input class="srch" id="srch" type="text" placeholder="Search the cards" aria-label="Search cards">
+            <div class="sizes">
+              <button class="sz" data-sz="m" aria-pressed="true">Desk</button>
+              <button class="sz" data-sz="l" aria-pressed="false">TV</button>
+            </div>
+          </div>
+          <div class="grid" id="grid"></div>
+        </div>
+        <aside class="right">
+          <div class="colhd"><h2>Teams</h2><span class="ct tnum" id="pickCt">0</span></div>
+          <div class="scroll" id="teams"></div>
+        </aside>
+      </div>
+    </section>
+
+    <!-- CAPTAINS -->
+    <section class="view" id="v-captains">
+      <div class="pane"><div class="pane-in">
+        <div class="noprint">
+          <h3 class="sec">Your five captains</h3>
+          <p class="hint">Captains are the one part of the draft that is not blind, so their cards go up on the screen while you announce the teams. Hit Present to walk through them one at a time on the projector before the first pick.</p>
+        </div>
+        <div class="actions noprint">
+          <button class="btn pri" id="btnPresent">Present captains</button>
+          <button class="btn sm" onclick="window.print()">Print</button>
+        </div>
+        <div class="capgrid" id="capGrid"></div>
+      </div></div>
+    </section>
+
+    <!-- CARDS -->
+    <section class="view" id="v-cards">
+      <div class="pane"><div class="pane-in">
+        <div class="noprint">
+          <h3 class="sec">Print the cards</h3>
+          <p class="hint">Anonymous cards for the captains' table: number and facts only, no name. Print two-up on letter stock and cut. Turn on Commissioner and the name prints at the bottom of each card, which is the key sheet you keep at the board and nobody else sees.</p>
+        </div>
+        <div class="actions noprint">
+          <button class="btn sm" onclick="window.print()">Print</button>
+          <span style="font-size:12px;color:var(--muted)" id="printNote"></span>
+        </div>
+        <div class="cardgrid" id="printGrid"></div>
+      </div></div>
+    </section>
+
+    <!-- ROSTER -->
+    <section class="view" id="v-roster">
+      <div class="pane"><div class="pane-in">
+        <div>
+          <h3 class="sec">Roster and responses</h3>
+          <p class="hint">32 form responses reconciled against the 41 names in the Notion People DB. Tick In to put someone on the board. Anyone marked out or with no card can still be added back here.</p>
+        </div>
+        <div id="rosterWarn"></div>
+        <div class="card">
+          <div class="actions noprint" style="margin-bottom:11px">
+            <button class="btn sm ghost" id="fAll" aria-pressed="true">All</button>
+            <button class="btn sm ghost" id="fIn" aria-pressed="false">Confirmed in</button>
+            <button class="btn sm ghost" id="fNo" aria-pressed="false">No card</button>
+            <span style="margin-left:auto;font-size:12px;color:var(--muted)"><b class="tnum" id="inCount">0</b> on the board</span>
+          </div>
+          <div class="tbl-wrap"><table>
+            <thead><tr><th style="width:32px">In</th><th style="width:48px">Card</th><th>Name</th><th>Role</th>
+              <th>Office</th><th style="width:92px">Response</th><th>Nickname</th><th style="width:70px">Drafted</th></tr></thead>
+            <tbody id="rosterBody"></tbody>
+          </table></div>
+        </div>
+      </div></div>
+    </section>
+
+    <!-- SETUP -->
+    <section class="view" id="v-setup">
+      <div class="pane"><div class="pane-in">
+        <div><h3 class="sec">Draft setup</h3>
+          <p class="hint">Set this before the room fills. Changing the team count or the order clears any picks already made.</p></div>
+        <div class="card">
+          <div class="fields">
+            <label class="f">Teams<select id="cfgTeams"></select></label>
+            <label class="f">Pick clock (seconds)<input id="cfgClock" type="number" min="15" max="600" step="15"></label>
+            <label class="f">Order<select id="cfgSnake">
+              <option value="1">Snake (1-2-3-3-2-1)</option><option value="0">Straight (1-2-3-1-2-3)</option></select></label>
+            <label class="f">Shape<input id="cfgRounds" type="text" readonly></label>
+          </div>
+        </div>
+        <div class="card">
+          <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:8px">
+            <h3 class="sec" style="margin:0">Teams and draft order</h3>
+            <button class="btn sm" id="btnShuffle">Randomize order</button>
+          </div>
+          <div id="teamRows"></div>
+        </div>
+        <div class="card">
+          <h3 class="sec" style="margin-bottom:9px">Export and reset</h3>
+          <div class="actions">
+            <button class="btn sm" id="btnCopy">Copy final rosters</button>
+            <button class="btn sm" id="btnCsv">Download CSV</button>
+            <button class="btn sm ghost" id="btnReset">Reset draft</button>
+          </div>
+        </div>
+      </div></div>
+    </section>
+  </main>
+</div>
+
+<div class="modal" id="cardModal"><div class="bigcard" id="bigcard"></div></div>
+
+<div class="pres" id="pres">
+  <div class="body">
+    <div class="tmlbl" id="prTeam"></div>
+    <div class="nm" id="prName"></div>
+    <div class="nk" id="prNick"></div>
+    <div class="quote" id="prQuote"></div>
+    <div class="rows" id="prRows"></div>
+  </div>
+  <div class="bar">
+    <button class="btn" id="prPrev">Back</button>
+    <span class="dots" id="prDots"></span>
+    <button class="btn pri" id="prNext">Next</button>
+    <button class="btn ghost" id="prClose">Close</button>
+  </div>
+</div>
+
+<div class="reveal" id="reveal"><div class="in">
+  <div class="pk" id="rvPick"></div>
+  <div class="cd" id="rvCard"></div>
+  <div class="nm" id="rvName"></div>
+  <div class="mt" id="rvMeta"></div>
+  <div class="to" id="rvTeam"></div>
+  <div class="x"><button class="btn big pri" id="rvClose">Next pick</button></div>
+</div></div>
+
+<script>
+const PLAYERS = [{"id":"p01","card":14,"name":"Taylor Hosmer","role":"Head of Finance & BD","office":"Atlanta","tenure":"3.7 yrs","tier":"Ops","status":"in","responded":true,"nick":"Pivot Table","competitive":"Dominoes and rowing. One of those makes sense at a company field day and one means I've thought about split times recreationally.","dominate":"Tug of war. Rowing is just tug of war with better posture and a worse view.","liability":"Soap box derby. Every skill I have involves generating my own power. Put me in a cart and let gravity do the work and I bring nothing to the vehicle but weight.","fact1":"I've stood on the summit of a 14,000-foot mountain.","fact2":"I was a public speaking champion in middle school and high school, which explains a lot about how I run meetings.","song":"DtMF \u2014 Bad Bunny","trash":"Draft me first or watch me all day from the wrong bench.","scout":"Endurance over flash \u2014 sorts the field, sets the pace, doesn't fade, and takes dominoes far too seriously."},{"id":"p02","card":1,"name":"Jesu Philip","role":"Account Manager","office":"Allentown","tenure":"5 mo","tier":"Sales","status":"in","responded":true,"nick":"Jes","competitive":"Game shows","dominate":"Trivia or any type of board game","liability":"","fact1":"I was on Family Feud and won in 2017!","fact2":"","song":"Electric Feel (MGMT)","trash":"Watch yourself!","scout":"Big talk, questionable skills, elite confidence."},{"id":"p03","card":19,"name":"Jennifer Snyder","role":"Recruiter","office":"Atlanta","tenure":"1.3 yrs","tier":"Recruiting","status":"in","responded":true,"nick":"One Tough Mother","competitive":"grocery store self check out speed","dominate":"I have to pick just one?","liability":"The quiet game or anything that requires a poker face","fact1":"I lived in Hawaii for 3 months over a summer and worked at a donut shop.","fact2":"I have been to Russia","song":"I'm still standing- Elton John","trash":"None of you people scare me","scout":"I raised 4 kids, this is basically a day off"},{"id":"p04","card":3,"name":"Ben Dorsey","role":"Recruiter","office":"Atlanta","tenure":"1.4 yrs","tier":"Recruiting","status":"in","responded":true,"nick":"Big Dawg","competitive":"Foot Racing","dominate":"NFL Combine Bench","liability":"Yoga","fact1":"I broke my Karate\u2019s teacher thumb at my first Karate Lesson and never went back.","fact2":"","song":"In the Air Tonight - Phill Collins","trash":"Oh that\u2019s too easy!","scout":"Unit."},{"id":"p05","card":12,"name":"Josh Mastel","role":"President","office":"Atlanta","tenure":"5.2 yrs","tier":"Leadership","status":"in","responded":true,"nick":"Mila\u2019s Superhero","competitive":"Not having a dad bod","dominate":"Getting exclusive reqs with interview times tomorrow, flexibility on the bill rate, follow up times immediately following the interview, a signed SOW, established start date that can walk in this quarter, and a few candidates already in mind.","liability":"An oil changing contest","fact1":"I broke my right femur at age 7 and didn\u2019t shed a tear","fact2":"I hear much better out of my right ear","song":"Not Like Us - K Lamar","trash":"Say it again and I\u2019ll have Chelsea beat yo ass","scout":"I don\u2019t know what else to say chip, the guy is just all heart."},{"id":"p06","card":25,"name":"Camryn Mastel","role":"Founder & CEO","office":"Atlanta","tenure":"9.8 yrs","tier":"Leadership","status":"in","responded":true,"nick":"Mo's Mama","competitive":"What? Me? Huh?","dominate":"Wiffle ball. Egg toss relay. Obstacle courses. Scarecrow dressing. Jumpy house races. Balloon toss. Racing. Roleplaying. Closing Ratio. Req to Close. Musical Brooms. Musical pony sticks. Anything with a timer or a scoreboard.","liability":"being average.","fact1":"Robbed of first place in state championship diving meet","fact2":"","song":"Like Toy Soldiers - Eminem","trash":"Trash talk? that's cute.","scout":"Wins things other people didn't know were contests."},{"id":"p07","card":20,"name":"Kollin Korell","role":"Account Manager","office":"Atlanta","tenure":"1.0 yrs","tier":"Sales","status":"in","responded":true,"nick":"Kollin is the man. This is me, Taylor, saying that Kollin rocks. Hell yeah, Kollin. You're my favorite at Innovien, I'm not joking!","competitive":"Almost everything except long-distance running. That's for someone else.","dominate":"I've been practicing my musical inflatable horses. If we end up doing that event again this year, watch out.","liability":"I did absolutely terrible at the axe-throwing event last year. I have not been axe throwing since, but I've been seeing how my 8mo son throws things in general, and I think I got the technique figured out.","fact1":"I'm the lead musical composer on a video game that's being developed.","fact2":"I'm confident I could beat anyone at Innovien in Smash Brothers, and it wouldn't even be close.","song":"Nobody Speaks by Run the Jewels","trash":"Get good, scrub","scout":"Sandbags every event, wins every event, acts surprised every time."},{"id":"p08","card":38,"name":"Riley Laverty","role":"Account Manager","office":"Atlanta","tenure":"3.7 yrs","tier":"Sales","status":"in","responded":true,"nick":"Smiley Riley","competitive":"Card games (like with a deck of cards)","dominate":"margarita making event (like who can make the best margarita)\nbut actual events that we've hosted: musical chairs","liability":"Any type of game that involves a ball (dodgeball, kickball, wiffle ball, you name it...)","fact1":"I carry a deck of cards in my purse and have been known to challenge ppl to card games while sitting at the bar","fact2":"","song":"Mask Off - Future","trash":"You stink!","scout":"If you want to have fun, pick me to be on your team"},{"id":"p09","card":5,"name":"Stephen Denzel","role":"Account Manager","office":"Allentown","tenure":"1.3 yrs","tier":"Sales","status":"in","responded":true,"nick":"Chief Keef","competitive":"sandwich making","dominate":"drag racing","liability":"tap dancing","fact1":"once completed a tour de france stage","fact2":"","song":"\"Coming in Hot\" - Peter Tosh","trash":"","scout":""},{"id":"p10","card":29,"name":"Gwen Martin","role":"Account Manager","office":"Atlanta","tenure":"3 mo","tier":"Sales","status":"in","responded":true,"nick":"Gwen to Win","competitive":"I am competitive all the way around but especially with sports. I love running, flag football, and wiffle ball.","dominate":"Not sure what events exactly take place since I have not attended.","liability":"If there is anything with quickness count me in!","fact1":"I am very competitive. Growing up I played several sports, go the gym, and run frequently. I also grew up with two brothers that always kept me active.","fact2":"","song":"Time Today - MoneyBagg Yo","trash":"","scout":"I have never attended Innovien games so you have no idea what beast I can unleash. Put me on your team and I'll show you!"},{"id":"p11","card":24,"name":"Gloria Manley","role":"Recruiter","office":"Atlanta","tenure":"6.6 yrs","tier":"Recruiting","status":"in","responded":true,"nick":"Glo Mama","competitive":"Being the best mom","dominate":"Carrying 100 things at once without dropping anything.","liability":"Anything where I have to protect the goal","fact1":"I once had to do community service for dancing on a stage","fact2":"I\u2019m allergic to cats but have two","song":"Save a horse ride a cowboy","trash":"Is that all you got","scout":"Multi tasker who gets shit done. Car pool line while closing an offer no problem."},{"id":"p12","card":23,"name":"Julia McDonald","role":"Recruiter","office":"Atlanta","tenure":"5.3 yrs","tier":"Recruiting","status":"maybe","responded":true,"nick":"JMAC","competitive":"driving!!!","dominate":"throwing things!","liability":"trivia and board games","fact1":"I was the mascot for the football team in middle school","fact2":"","song":"No broke boys (nikko)","trash":"get away from me","scout":"I\u2019m organized and competitive and you want me on your team"},{"id":"p13","card":33,"name":"Ryan Mickley","role":"Recruiter","office":"Allentown","tenure":"1.3 yrs","tier":"Recruiting","status":"maybe","responded":true,"nick":"MickLovin","competitive":"Making my yard look the best on the street","dominate":"Golf","liability":"Chess","fact1":"Was personally asked to tryout for a AAA baseball team during my Junior year of high school","fact2":"","song":"I Get the Bag (Gucci Mane, Migos)","trash":"Which one of you is coming in second?","scout":"Played sports my whole life, so I take feedback well, hate losing, and probably care way too much about meaningless competitions."},{"id":"p14","card":8,"name":"Jordan Foote","role":"Recruiter","office":"Atlanta","tenure":"4.2 yrs","tier":"Recruiting","status":"in","responded":true,"nick":"Jfoote","competitive":"Basketball","dominate":"Sports (basketball, football, tug of war, etc.)","liability":"Anything that requires you to be a small compacted individual.","fact1":"I played the clarinet, flute, and saxophone in middle school. Also played 4 times at the Georgia Symphony Orchestra 4 times.","fact2":"That's that best I got.","song":"Feel it - 21 Savage","trash":"\"You're not like that\"","scout":"True scouting report from college: \"Well rounded player. Don't talk s***t to him. He goes, they go. Contest everything make it tough, and for gods sake don't fall for the pump fake.\""},{"id":"p15","card":4,"name":"Jamie Houvig","role":"Recruiter","office":"Allentown","tenure":"1.3 yrs","tier":"Recruiting","status":"in","responded":true,"nick":"The Big Guy","competitive":"Playing basketball with my kids and nephews.","dominate":"Anything that requires strength or height.","liability":"a race","fact1":"I have over 300 cigars in my cigar humidor.","fact2":"","song":"Metallica Seek and Destroy","trash":"Just hope you are on my team.","scout":"Strong, light on my feet, and very competitive."},{"id":"p16","card":21,"name":"Chelsea Navarro","role":"Recruiter Lead","office":"Atlanta","tenure":"4.3 yrs","tier":"Recruiting","status":"out","responded":true,"nick":"","competitive":"","dominate":"","liability":"","fact1":"I was riding in a car with my best friend a few years ago without my seatbelt on. We started talking about a time that we almost died in a car wreck that our friend caused because he was speeding. The story spooked me, and I put my seatbelt on (I don't know why I didn't have it on in the first place) and 10 minutes later my friend swerved off of the road into a tree. Had we not talked about the car wreck, I'd probably be dead. Things just got DEEP!","fact2":"","song":"Bottoms Up - Keke Palmer","trash":"I'll fold you like a lawn chair, brother.","scout":"I won't be there. :("},{"id":"p17","card":34,"name":"Mike Murphy","role":"Recruiter","office":"Charlotte","tenure":"1.2 yrs","tier":"Recruiting","status":"in","responded":true,"nick":"The best Mike at Innovien","competitive":"If you beat me at Madden I'll lose my mind","dominate":"Oklahoma drill and cooking a souffle, I'm diverse like that","liability":"Puzzles, I'm going to sit this one out","fact1":"Hiked the lonest hike at Bryce cannon and only cried once","fact2":"","song":"G.O.M.D - J. Cole","trash":"Just have to call you \"buddy\" or \"chief\" and you're shook","scout":"First one in the locker room last one out"},{"id":"p18","card":17,"name":"Daley Bell","role":"Account Manager","office":"Charlotte","tenure":"3 mo","tier":"Sales","status":"in","responded":true,"nick":"BIG DALE","competitive":"soccer adjacent activities","dominate":"kickball, racing, cheering people on","liability":"Football or basketball I'm sorry","fact1":"I was the most aggressive on my soccer team, didn't matter how tall you were!!","fact2":"I grew up with 3 older brothers, I promise I got that dog in me","song":"Loose as a goose- Boosie Badazz","trash":"You just got dale'd","scout":"My word on the back of my jersey when I was 8 was \"determined\""},{"id":"p19","card":2,"name":"MJ Pierce","role":"Enablement","office":"Nashville","tenure":"1.6 yrs","tier":"Ops","status":"out","responded":true,"nick":"","competitive":"","dominate":"","liability":"","fact1":"","fact2":"","song":"","trash":"","scout":""},{"id":"p20","card":16,"name":"Ty Thompson","role":"Account Manager","office":"Atlanta","tenure":"3 mo","tier":"Sales","status":"in","responded":true,"nick":"Teezy T","competitive":"Jeopardy on superhero's, Star Wars, and the Bible.\n\nPhysical competitions: Push-ups, footrace, plank competition, Jump the highest. Walking routes\n\nMental competitions: Riddles, big math problems, charades, guess that song.","dominate":"Any sort of tug of war. \n\nBaseball Softball. \n\nPhysical competitions: Push-ups, footrace, plank competition, Jump the highest\n\nMental competitions: Riddles, big math problems, charades,","liability":"Anything that has to do with long bouts of hand eye coordination: Ping-pong, pickle ball, Jungling etc. \n\nEndurance games. \n\nAnything that being too heavy would hinder. \n\nCard games. \n\nFreestyling.","fact1":"I'm In two college football video games.","fact2":"I made Ireland national news.","song":"Can't tell me nothing - Old Kanye","trash":"\"Are you not entertained?\"","scout":"\"Power personified, Agility Actualized, And Victory Vivified.\""},{"id":"p21","card":28,"name":"Kyle Kennedy","role":"Account Manager","office":"Charlotte","tenure":"3 mo","tier":"Sales","status":"in","responded":true,"nick":"K-Squared","competitive":"Anything and absolutely everything.","dominate":"Anything climbing related.","liability":"Distance running","fact1":"I've rock climbed the tallest route in Colorado (over 1,500')","fact2":"","song":"The Kids Aren't Alright- The Offspring","trash":"If this was The Hunger Games, you'd be dead already.","scout":"Scrappy, competitive, willing to do anything to win."},{"id":"p22","card":37,"name":"Monika DuVarney","role":"Recruiter","office":"Atlanta","tenure":"7.7 yrs","tier":"Recruiting","status":"out","responded":true,"nick":"","competitive":"","dominate":"","liability":"","fact1":"","fact2":"","song":"","trash":"","scout":""},{"id":"p23","card":18,"name":"Cherie Huey","role":"","office":"","tenure":"","tier":"Ops","status":"in","responded":true,"nick":"Iron Will","competitive":"Being right & Never quitting","dominate":"Horseback Riding","liability":"Anything with written instructions. Give me a paragraph and I've already lost the team the round","fact1":"I'm a two-time NCAA National Champion","fact2":"","song":"\"Stronger (What Doesn't Kill You)\" \u2014 Kelly Clarkson","trash":"Break my spirit? Good luck. I've survived worse and I still think I'm right about it.","scout":"Can't read a map, but will outlast every single one of you."},{"id":"p24","card":10,"name":"Malia Graham","role":"Head of Emerging Markets","office":"Atlanta","tenure":"7.3 yrs","tier":"Leadership","status":"in","responded":true,"nick":"Mollya","competitive":"College football - I'm not allowed to watch it in public /:","dominate":"Pie baking hehehe","liability":"a high-speed foot race","fact1":"I've seen and own on box set, every single episode of Dog the Bounty Hunter.","fact2":"","song":"100 Shots","trash":"4 peat?","scout":"Three-peat champion and looking to make it a fourth."},{"id":"p25","card":11,"name":"Merrimon McCartney","role":"Recruiter","office":"Atlanta","tenure":"5.6 yrs","tier":"Recruiting","status":"in","responded":true,"nick":"Merm the Worm","competitive":"Everything I hate losing!!! Games that are supposed to be \u201cjust for fun.\u201d","dominate":"Musical chairs!! Anything with athleticism","liability":"Anything trivia or using my brain","fact1":"This is hard because everyone knows my fun facts but I like ripping splitz","fact2":"","song":"Gasolina","trash":"Stupid Idiot","scout":"Short, fiesty and ready to compete and break legs"},{"id":"p26","card":27,"name":"Hannah Craig","role":"Account Manager","office":"Atlanta","tenure":"7.3 yrs","tier":"Sales","status":"in","responded":true,"nick":"HCRAIGGG","competitive":"Any type of alcohol chugging contests","dominate":"Musical chairs & relay races","liability":"Tug of war but I make up for it in all other areas!!!","fact1":"I got suspended in 6th grade for vandalizing school property","fact2":"My dad told me to defend myself if I got bullied again in middle school so I threw a brick at a boy at the bus stop the next day","song":"Alive - Pearl Jam","trash":"Wait... who TF are you?","scout":"I may look small but I'm fearless, full of surprises, and sneaky as hell which has proven to be successful if you check the records."},{"id":"p27","card":40,"name":"Brennan Lantz","role":"Recruiter","office":"Atlanta","tenure":"1.4 yrs","tier":"Recruiting","status":"in","responded":true,"nick":"BLantz","competitive":"Going longer / faster than the person on the same machine next to me at the gym","dominate":"Freestyle swimming lap race in pool","liability":"Real axe throwing","fact1":"Used to be CPR certified and have successfully given the heimlich maneuver several times, two of which revived the person from unconsciousness","fact2":"","song":"X Gon' Give It to Ya by DMX","trash":"Do your job.","scout":"I may not know what the games are yet, but I know who\u2019s winning them."},{"id":"p28","card":31,"name":"Trevor Lowe","role":"","office":"","tenure":"","tier":"Ops","status":"in","responded":true,"nick":"T Lowe","competitive":"I am irrationally competitive on anything that requires strength or being physical. I care more about beating someone or a team even if it requires me to pull myself out of something or step up and be the person they rely on as long as we win.","dominate":"Golf, cornhole, whiffle ball, kickball, dodgeball, board games, basketball, puzzles and anything that involves sports or games that require mental fortitude. I play in a cornhole league and always golf for $$ or anything competitive I do I like to put $$ on the line","liability":"I don't think I'd be a liability in anything. If I don't know it then I could easily pick up on it, but if I had to choose one thing it would be","fact1":"I was homecoming king in HS","fact2":"My biological father is 50% African American which makes me 25%!","song":"one of wun - Gunna","trash":"okay big guy","scout":"Profile: 6'2\", 200 lbs | Former NCAA Division I Athlete | SEC Champion\n\nA physically imposing, battle-tested competitor with championship experience at the highest level of collegiate athletics. Combines size, power, coordination, and adaptability with the confidence to excel across multiple sports.\n\nAthletic Traits\n\nSize/Power: Strong 6'2\", 200-pound frame built for contact, leverage, and explosive movement\n\nAthleticism: Division I-caliber speed, coordination, body control, and competitive endurance\n\nVersatility: Natural ability to transfer elite athletic traits across sports and unfamiliar challenges\n\nExperience: Proven in the SEC, where preparation, execution, and composure are tested constantly\n\nMentality: Relentless competitor who expects to control the matchup and dictate the pace\n\nCompetitive Assessment\n\nPlays with presence, urgency, and calculated aggression. Comfortable under pressure and unwilling to concede an advantage. Studies opponents, identifies weaknesses quickly, and adjusts in real time. Competes through fatigue and adversity without losing focus.\n\nProjection\n\nA high-upside, championship-caliber athlete whose physical tools are matched by conviction and competitive discipline. Projects as an immediate tone-setter in any athletic environment: confident, adaptable, difficult to intimidate, and determined to outperform anyone across from him.\n\nBottom line: Elite competitive pedigree. SEC-proven toughness. Built to impose his game, rise under pressure, and pursue victory with relentless discipline."},{"id":"p29","card":26,"name":"Elizabeth Wade","role":"Backoffice Specialist","office":"Allentown","tenure":"1.3 yrs","tier":"Ops","status":"out","responded":true,"nick":"","competitive":"","dominate":"","liability":"","fact1":"","fact2":"","song":"","trash":"","scout":""},{"id":"p30","card":39,"name":"Luke Reineke","role":"Recruiter","office":"Atlanta","tenure":"3.3 yrs","tier":"Recruiting","status":"in","responded":true,"nick":"Luko","competitive":"knowing the quickest route to a specific destination","dominate":"foot race","liability":"foot race","fact1":"I won $300 of free groceries at Kroger for winning a pop-a-shot basketball competition as a young child","fact2":"","song":"What I've Done - Linkin Park","trash":"You're not that guy pal, you're not that guy","scout":"Just a sneaky athletic individual that just plays the game the right way."},{"id":"p31","card":32,"name":"Mike Minnillo","role":"Account Manager","office":"Columbus","tenure":"1.2 yrs","tier":"Sales","status":"in","responded":true,"nick":"The Thriller","competitive":"The Innovien games","dominate":"Trivia","liability":"Axe Throwing and the untangling of the ropes gear","fact1":"13th Cousins with Princess Diana","fact2":"","song":"Tops Drop - Fat Pat","trash":"Your mom.","scout":"All heart, all pride, you'll get my best effort!"},{"id":"p32","card":36,"name":"Brie Branting","role":"Account Manager","office":"Atlanta","tenure":"1.0 yrs","tier":"Sales","status":"in","responded":true,"nick":"Momma B","competitive":"Everything...","dominate":"100 meter dash, IF the foot wasn't injured lol","liability":"Sewing...","fact1":"I carry two 40 pound objects around 50% of the time","fact2":"I have precognition dreams! aka I can see the future in my dreams....","song":"Diva, Beyonce","trash":"Actions speak louder than words","scout":"Can't stop, won't stop- relentless & determined to win."},{"id":"p33","card":7,"name":"Mollie Ferguson","role":"Account Manager","office":"Atlanta","tenure":"5.6 yrs","tier":"Sales","status":"out","responded":false,"nick":"","competitive":"","dominate":"","liability":"","fact1":"","fact2":"","song":"","trash":"","scout":""},{"id":"p34","card":15,"name":"Rachel Huffman","role":"Account Manager","office":"Atlanta","tenure":"4 mo","tier":"Sales","status":"out","responded":false,"nick":"","competitive":"","dominate":"","liability":"","fact1":"","fact2":"","song":"","trash":"","scout":""},{"id":"p35","card":41,"name":"Riley Caines","role":"Account Manager","office":"Atlanta","tenure":"3 mo","tier":"Sales","status":"in","responded":true,"nick":"Calvin","competitive":"Trivia","dominate":"Beer chugging","liability":"Foot race","fact1":"I\u2019ve gotten my license suspended for speeding.","fact2":"I love singing karaoke","song":"WWE: I won\u2019t do what you tell me ( Stone Cold Steve Austin )","trash":"","scout":"Scrappy, high motor, lunch pail guy, fundamentally sound."},{"id":"p36","card":35,"name":"Courtney Smith","role":"Director of Ops","office":"Atlanta","tenure":"8.3 yrs","tier":"Ops","status":"out","responded":false,"nick":"","competitive":"","dominate":"","liability":"","fact1":"","fact2":"","song":"","trash":"","scout":""},{"id":"p37","card":42,"name":"Adam Williams","role":"Recruiter","office":"Atlanta","tenure":"3.9 yrs","tier":"Recruiting","status":"in","responded":true,"nick":"Adam","competitive":"Cornhole, Mario Kart, Mario Party, Mini golf with my wife, and beer pong.","dominate":"Anything cooking related, cornhole, beer pong.","liability":"Whatever that rope escape thing we did last year, that was not my brightest moment.","fact1":"I got a belly button piercing when I was 19. Didn't last long","fact2":"","song":"Billie Jean - Michael Jackson","trash":"Don't hate, accelerate","scout":"Prepared to do whatever it takes to win"},{"id":"p38","card":6,"name":"Brandon Dowdell","role":"Recruiter","office":"Atlanta","tenure":"4.0 yrs","tier":"Recruiting","status":"maybe","responded":true,"nick":"B-Dow","competitive":"Spades. I\u2019m the best card player anyone\u2019s ever come across in North America.","dominate":"Cornhole, Beer Dye, Spikeball, and honestly any other event y\u2019all want the smoke in.","liability":"The liability is whoever has to go against me","fact1":"I sell ice in the winter. I sell fire in hell. I am a hustler baby, I\u2019ll sell water to a well. I was born to get cake, move on and switch states.","fact2":"I sometimes talk to myself to give expert advice.","song":"\"Flower\" by Moby","trash":"I'll buy you","scout":"Get rich or die tryin'"},{"id":"p39","card":22,"name":"Victoria Bonilla","role":"Director of Recruiting","office":"Atlanta","tenure":"2.1 yrs","tier":"Leadership","status":"in","responded":true,"nick":"Tori","competitive":"WINNING \ud83d\ude06","dominate":"Musical broomsticks\u2026..","liability":"The obstacle course","fact1":"A picture of me was on the front page of the local newspaper the week I was born!","fact2":"I played the flute and piccolo in high school","song":"Yeah! By Usher & Lil Jon","trash":"I\u2019m about to delegate you all to the bench","scout":"Draft me for pure grit, relentless hustle, and someone who doesn\u2019t pull punches. I might not have the coordination, but I move fast and have the determination to carry this team to a win."},{"id":"p40","card":9,"name":"Shannon Johnson","role":"Head of Growth","office":"Atlanta","tenure":"7 mo","tier":"Leadership","status":"in","responded":true,"nick":"ShanJohn","competitive":"Winning obviously but more importantly, being right. To be honest though, the most important of all is being an expert in all things Bravo. I'm oddly competitive about pop culture trivia. \nUnclear how that fits in with my first Innovien Games, but this is knowledge that's never failed me and always comes in handy somehow.","dominate":"Pop Culture Trivia. And anything that requires drinking with speed and efficiency","liability":"Any event that requires a bat","fact1":"In college, I was Lisa Frank's nanny. Yes, the lady that did the colorful trapper keepers and school supplies.","fact2":"I was born in Germany and studied abroad in Paris, I don't speak a lick of German but my French is pretty solid with a few glasses of wine.","song":"RocBoys by Jay-Z","trash":"Grow up","scout":"They say winning isn't everything and by they I mean those in second place."},{"id":"p41","card":30,"name":"Jon Pack","role":"Account Manager","office":"Charlotte","tenure":"1.8 yrs","tier":"Sales","status":"out","responded":true,"nick":"Jon","competitive":"","dominate":"","liability":"","fact1":"","fact2":"","song":"","trash":"","scout":""},{"id":"p42","card":13,"name":"Abigail Brumbeloe","role":"Account Manager","office":"Nashville","tenure":"3 mo","tier":"Sales","status":"noreply","responded":false,"nick":"","competitive":"","dominate":"","liability":"","fact1":"","fact2":"","song":"","trash":"","scout":""},{"id":"p43","card":43,"name":"Kelsie Laughlin","role":"Sr. Account Manager","office":"Nashville","tenure":"3.1 yrs","tier":"Sales","status":"maybe","responded":true,"nick":"KeeKee Milliken","competitive":"swimming/ treading water","dominate":"swimming, treading water, bowling, cornhole,","liability":"Anything that involves my bum knee - sharp turns, running, jumping, etc. And for the record, I blew it out playing indoor volleyball, my glory days are over.","fact1":"I went to State Competition in sewing","fact2":"My fingers are double jointed and incredibly flexible, LOL.","song":"In My Feelings - Drake - play the line 'Kiki, do you love me? Are you riding?..'","trash":"You can't teach height.","scout":"Tall, competitive, and way more athletic than my knee currently allows me to prove"}];
+</script>
+<script>
+const PALETTE=["#B0DD66","#E3B34A","#5FBCA6","#D9865A","#B98FC9","#7FB6D6","#C98FA8","#9DB88A"];
+const TNAMES=["Green","Gold","Teal","Clay","Plum","Sky","Rose","Sage"];
+const SCHOOLS=["Pending State University","TextUs Tech University","Vanderbilled University",
+  "Spreadford University","Oregong University"];
+const CAPTAINS=["Hannah Craig","Jamie Houvig","Stephen Denzel","Malia Graham","Jordan Foote"];
+const pidByName=n=>{const m=PLAYERS.find(p=>p.name===n);return m?m.id:""};
+const mkTeams=n=>Array.from({length:n},(_,i)=>({id:"t"+(i+1),name:SCHOOLS[i]||("Team "+TNAMES[i]),
+  captainId:CAPTAINS[i]?pidByName(CAPTAINS[i]):"",color:PALETTE[i]}));
+
+function freshState(){
+  return {v:3,updatedAt:0,
+    cfg:{clockSec:60,snake:true,order:["t1","t2","t3","t4","t5"]},
+    teams:mkTeams(5),
+    roster:PLAYERS.map(p=>({...p,in:p.status==="in"||p.status==="maybe"})),
+    picks:[],clock:{running:false,endsAt:null,remaining:60},
+    stage:{pid:null,mode:null}};
+}
+let S=freshState(), commish=false, showNick=false, presenting=false, db=null, ref=null;
+let sel=null, filterQ="", rFilter="all";
+
+const LS="ig2026-blind-v3";
+const saveLocal=()=>{try{localStorage.setItem(LS,JSON.stringify(S))}catch(e){}};
+function loadLocal(){try{const r=localStorage.getItem(LS);if(r){const d=JSON.parse(r);if(d&&d.v===3)return d}}catch(e){}return null}
+async function push(){
+  S.updatedAt=Date.now(); saveLocal();
+  if(db&&ref&&commish){
+    try{await ref.set(JSON.parse(JSON.stringify(S))); setSync("live","live")}
+    catch(e){setSync("local", e.code==="invalid_argument"?"view only":"local")}
+  }
+}
+function setSync(c,t){document.getElementById("dot").className="dot"+(c?" "+c:"");document.getElementById("syncTxt").textContent=t}
+
+const capIds=()=>new Set(S.teams.map(t=>t.captainId).filter(Boolean));
+const capName=t=>{const p=t.captainId?player(t.captainId):null;return p?p.name:""};
+/* fold newly arrived form responses into state the commissioner already has */
+function syncRoster(){
+  if(!S.roster)return false;
+  let changed=false;
+  const by={}; S.roster.forEach(p=>by[p.id]=p);
+  PLAYERS.forEach(src=>{
+    const cur=by[src.id];
+    const dflt=s=>s==="in"||s==="maybe";
+    if(!cur){ S.roster.push({...src,in:dflt(src.status)}); changed=true; return }
+    if(JSON.stringify({...cur,in:undefined})===JSON.stringify({...src,in:undefined}))return;
+    const wasDefault = cur.in===dflt(cur.status);
+    Object.assign(cur,src);
+    if(wasDefault) cur.in=dflt(src.status);
+    changed=true;
+  });
+  return changed;
+}
+const inPool=()=>{const c=capIds();return S.roster.filter(p=>p.in&&!c.has(p.id))};
+const rosterIn=()=>S.roster.filter(p=>p.in);
+const drafted=()=>new Set(S.picks.map(p=>p.playerId));
+const team=id=>S.teams.find(t=>t.id===id);
+const player=id=>S.roster.find(p=>p.id===id);
+const isDone=()=>S.picks.length>=inPool().length;
+function onClock(n){const T=S.cfg.order.length;if(!T)return null;
+  const r=Math.floor(n/T);let i=n%T;if(S.cfg.snake&&r%2===1)i=T-1-i;
+  return {teamId:S.cfg.order[i],round:r+1}}
+const clockLeft=()=>S.clock.running?Math.max(0,Math.round((S.clock.endsAt-Date.now())/1000)):(S.clock.remaining??S.cfg.clockSec);
+const mmss=s=>Math.floor(s/60)+":"+String(s%60).padStart(2,"0");
+const esc=s=>String(s??"").replace(/[&<>"]/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]));
+const hook=p=>p.scout||p.dominate||p.competitive||p.fact1||"";
+
+function makePick(pid){
+  if(!commish||isDone()||drafted().has(pid))return;
+  const oc=onClock(S.picks.length); if(!oc)return;
+  const pk={n:S.picks.length+1,round:oc.round,teamId:oc.teamId,playerId:pid,at:Date.now()};
+  S.picks.push(pk);
+  S.clock={running:false,endsAt:null,remaining:S.cfg.clockSec};
+  push(); renderStrip(); renderTeams();
+}
+function undo(){if(!commish||!S.picks.length)return;S.picks.pop();
+  S.clock={running:false,endsAt:null,remaining:S.cfg.clockSec};push();render()}
+function toggleClock(){if(!commish)return;const c=S.clock;
+  if(c.running){c.remaining=Math.max(0,Math.round((c.endsAt-Date.now())/1000));c.running=false;c.endsAt=null}
+  else{c.endsAt=Date.now()+(c.remaining||S.cfg.clockSec)*1000;c.running=true}
+  push();render()}
+
+function showReveal(pk){
+  const p=player(pk.playerId),t=team(pk.teamId); if(!p||!t)return;
+  document.getElementById("rvPick").textContent="Round "+pk.round+" · Pick "+pk.n;
+  document.getElementById("rvCard").textContent="Card "+String(p.card).padStart(2,"0");
+  const nm=document.getElementById("rvName"); nm.textContent=p.name; nm.style.color=t.color;
+  document.getElementById("rvMeta").textContent=[p.role,p.office].filter(Boolean).join(" · ");
+  const to=document.getElementById("rvTeam"); to.textContent="to "+t.name; to.style.color=t.color;
+  document.getElementById("reveal").classList.add("on");
+  document.getElementById("rvClose").focus();
+}
+document.getElementById("rvClose").onclick=()=>document.getElementById("reveal").classList.remove("on");
+document.addEventListener("keydown",e=>{
+  if(e.key!=="Escape")return;
+  const m=document.getElementById("cardModal");
+  if(m.classList.contains("on")){if(commish)closeModal();return}
+  document.getElementById("reveal").classList.remove("on")});
+
+/* ---------- render ---------- */
+function render(){renderStrip();renderGrid();renderTeams();renderCaptains();renderRoster();renderPrint();renderSetup();syncModal()}
+
+function renderStrip(){
+  const done=isDone(), oc=done?null:onClock(S.picks.length), t=oc?team(oc.teamId):null;
+  document.getElementById("pickNo").textContent=done?"—":oc.round+"."+String(S.picks.length+1).padStart(2,"0");
+  document.getElementById("clockLabel").textContent=done?"Draft complete":"On the clock";
+  document.getElementById("ocTeam").textContent=done?"All picks in":(t?t.name:"—");
+  document.getElementById("ocChip").style.background=t?t.color:"var(--line2)";
+  document.getElementById("ocCap").textContent=done
+    ? S.picks.length+" cards drafted"
+    : (t&&capName(t)?"Captain: "+capName(t):"Captain not set")+" · pick "+(S.picks.length+1)+" of "+inPool().length;
+  const left=clockLeft(),cb=document.getElementById("clockBox");
+  document.getElementById("clockT").textContent=mmss(left);
+  cb.className="clockbox"+(left===0?" out":left<=10?" warn":"");
+  const bc=document.getElementById("btnClock");
+  bc.textContent=S.clock.running?"Pause":(left===0?"Reset":"Start");
+  bc.disabled=!commish||done;
+  document.getElementById("btnUndo").disabled=!commish||!S.picks.length;
+  document.getElementById("boardCtl").style.visibility=commish?"visible":"hidden";
+}
+
+const FIELDS=[["competitive","Irrationally competitive about"],["dominate","Would dominate"],
+  ["liability","Would be a liability in"],["fact1","Random fact"],["fact2","And one more"],
+  ["song","Walk-up song"],["trash","Trash talk"],["scout","Scouting report"]];
+
+const TILE_LABEL={competitive:"Competitive about",dominate:"Dominates",liability:"Liability",
+  fact1:"Random fact",fact2:"Random fact",song:"Walk-up",trash:"Trash talk",scout:"Scouting report"};
+
+/* two short, distinct lines for the tile */
+function tileLines(p){
+  const pick=ks=>{for(const k of ks){const v=(p[k]||"").trim();if(v)return[k,v]}return null};
+  const a=pick(["dominate","scout","competitive","fact1","trash","liability","fact2"]);
+  const b=pick(["trash","scout","fact1","competitive","liability","fact2","dominate"].filter(k=>!a||k!==a[0]));
+  const cut=(v,n)=>v.length>n?v.slice(0,n-1).trim()+"…":v;
+  return [a?[a[0],cut(a[1],86)]:null, b?[b[0],cut(b[1],76)]:null];
+}
+
+function renderGrid(){
+  const d=drafted(), q=filterQ.trim().toLowerCase();
+  const all=inPool().sort((a,b)=>a.card-b.card);
+  document.getElementById("availCt").textContent=(all.length-d.size)+" of "+all.length+" left";
+  document.getElementById("pickCt").textContent=S.picks.length;
+  const g=document.getElementById("grid"); g.innerHTML="";
+  const list=all.filter(p=>!q||(p.card+" "+p.competitive+" "+p.dominate+" "+p.liability+" "+
+    p.fact1+" "+p.fact2+" "+p.trash+" "+p.scout+" "+(showNick?p.nick:"")).toLowerCase().includes(q));
+  if(!list.length){g.innerHTML='<div class="empty">Nothing matches that search.</div>';return}
+  list.forEach(p=>{
+    const pk=S.picks.find(x=>x.playerId===p.id), t=pk?team(pk.teamId):null;
+    const el=document.createElement(pk?"div":"button");
+    const [l1,l2]=tileLines(p);
+    el.className="tile"+(pk?" taken":"")+(l1?"":" blank");
+    if(t)el.style.setProperty("--tc",t.color);
+    el.innerHTML='<span class="no"></span>'+
+      '<span class="l1"><b></b><span></span></span>'+
+      '<span class="l2"><b></b><span></span></span>'+
+      '<span class="who"></span><span class="to"></span>';
+    el.querySelector(".no").textContent=String(p.card).padStart(2,"0");
+    const s1=el.querySelector(".l1"), s2=el.querySelector(".l2");
+    s1.firstChild.textContent=l1?TILE_LABEL[l1[0]]:"";
+    s1.lastChild.textContent=l1?l1[1]:"No card submitted";
+    const nickMode=showNick&&p.nick;
+    s2.firstChild.textContent=nickMode?"Goes by":(l2?TILE_LABEL[l2[0]]:"");
+    s2.lastChild.textContent=nickMode?'"'+p.nick+'"':(l2?l2[1]:"");
+    if(!l2&&!nickMode)s2.style.display="none";
+    if(pk){
+      el.querySelector(".who").textContent=p.name;
+      el.querySelector(".to").textContent=t?t.name:"";
+    } else {
+      el.title="Open card "+p.card;
+      el.onclick=()=>openCard(p.id);
+    }
+    g.appendChild(el);
+  });
+}
+
+/* ---- card modal: stage 1 the card, stage 2 the name ---- */
+let modalPid=null;
+function setStage(pid,mode){
+  if(!commish)return;
+  S.stage={pid:pid||null,mode:mode||null};
+  push();
+}
+function openCard(pid){modalPid=pid;setStage(pid,"card");drawModal("card");
+  document.getElementById("cardModal").classList.add("on")}
+function closeModal(){document.getElementById("cardModal").classList.remove("on");
+  modalPid=null;setStage(null,null);render()}
+
+/* every viewer follows the commissioner: open, advance and close the same card */
+function syncModal(){
+  const st=S.stage||{}, m=document.getElementById("cardModal");
+  if(!st.pid||!st.mode){ m.classList.remove("on"); modalPid=null; return }
+  const changed = modalPid!==st.pid || m.dataset.mode!==st.mode;
+  modalPid=st.pid; m.dataset.mode=st.mode;
+  if(changed){ drawModal(st.mode); m.classList.add("on") }
+}
+
+function drawModal(stage){
+  const p=player(modalPid); if(!p)return;
+  document.getElementById("cardModal").dataset.mode=stage;
+  const pk=S.picks.find(x=>x.playerId===p.id);
+  const oc=isDone()?null:onClock(S.picks.length);
+  const t=pk?team(pk.teamId):(oc?team(oc.teamId):null);
+  const bc=document.getElementById("bigcard");
+  bc.style.setProperty("--tc",t?t.color:"var(--green)");
+
+  if(stage==="name"&&pk){
+    bc.innerHTML=
+      '<div class="bc-body" style="text-align:center;padding:44px 24px 34px">'+
+      '<div class="pk" style="font-family:var(--disp);font-size:14px;letter-spacing:.3em;'+
+        'text-transform:uppercase;color:'+t.color+'">Round '+pk.round+' · Pick '+pk.n+'</div>'+
+      '<div style="font-family:var(--disp);font-weight:700;font-size:clamp(30px,5vw,52px);'+
+        'line-height:1;color:var(--line2);margin:8px 0 2px">Card '+String(p.card).padStart(2,"0")+'</div>'+
+      '<div style="font-family:var(--disp);font-weight:700;font-size:clamp(38px,7vw,80px);line-height:1;'+
+        'text-transform:uppercase;color:'+t.color+';animation:pop .45s cubic-bezier(.2,1.4,.4,1)">'+esc(p.name)+'</div>'+
+      '<div style="margin-top:10px;font-size:16px;color:var(--muted)">'+
+        esc([p.role,p.office].filter(Boolean).join(" · "))+'</div>'+
+      '<div style="margin-top:18px;font-family:var(--disp);font-size:24px;letter-spacing:.08em;'+
+        'text-transform:uppercase;color:'+t.color+'">to '+esc(t.name)+'</div></div>'+
+      '<div class="bc-foot">'+(commish
+        ?'<button class="btn big pri" id="mNext">Next pick</button><div class="note">Esc closes</div>'
+        :'<div class="note" style="margin:0 auto">On the board</div>')+'</div>';
+    const nx=document.getElementById("mNext");
+    if(nx){nx.onclick=closeModal;nx.focus()}
+    return;
+  }
+
+  let h2='<div class="bc-hd"><div class="bc-no">'+String(p.card).padStart(2,"0")+'<small>Card</small></div>';
+  if(showNick&&p.nick)h2+='<div class="bc-nick"><span class="k">Goes by</span><div class="v">'+esc(p.nick)+'</div></div>';
+  h2+='</div><div class="bc-body">';
+  let any=false;
+  FIELDS.forEach(([k,l])=>{if(!p[k])return;any=true;
+    h2+='<div class="fx"><span class="k">'+l+'</span><div class="v">'+esc(p[k])+'</div></div>'});
+  if(!any)h2+='<div class="fx"><div class="v" style="color:var(--dim);font-style:italic">'+
+    'This person did not fill out the form. You are drafting a blank card.</div></div>';
+  h2+='</div><div class="bc-foot">';
+  if(pk){
+    h2+=commish?'<button class="btn" id="mShow">Show the name</button><button class="btn ghost" id="mBack">Back to the board</button><div class="note">Already drafted</div>'
+       :'<div class="note" style="margin:0 auto">Reading the card</div>';
+  } else if(commish&&!isDone()){
+    h2+='<button class="btn big pri" id="mDraft">Reveal the pick</button>'+
+        '<button class="btn ghost" id="mBack">Back to the board</button>'+
+        '<div class="note">'+esc(t?t.name+" is on the clock":"")+'</div>';
+  } else if(commish){
+    h2+='<button class="btn" id="mBack">Back to the board</button><div class="note">Draft complete</div>';
+  } else {
+    h2+='<div class="note" style="margin:0 auto">Reading the card</div>';
+  }
+  h2+='</div>';
+  bc.innerHTML=h2;
+  const bD=document.getElementById("mDraft"), bB=document.getElementById("mBack"), bS=document.getElementById("mShow");
+  if(bD){bD.onclick=()=>{makePick(p.id);setStage(p.id,"name");drawModal("name")};bD.focus()}
+  if(bB)bB.onclick=closeModal;
+  if(bS)bS.onclick=()=>{setStage(p.id,"name");drawModal("name")};
+}
+document.getElementById("cardModal").onclick=e=>{if(commish&&e.target.id==="cardModal")closeModal()};
+
+function renderTeams(){
+  const wrap=document.getElementById("teams");
+  const oc=isDone()?null:onClock(S.picks.length);
+  wrap.innerHTML="";
+  S.cfg.order.forEach(tid=>{
+    const t=team(tid); if(!t)return;
+    const mine=S.picks.filter(p=>p.teamId===tid);
+    const d=document.createElement("div");
+    d.className="tm"+(oc&&oc.teamId===tid?" active":"");
+    d.style.setProperty("--tc",t.color);
+    const cn=capName(t);
+    let h='<div class="tm-hd"><span class="nm">'+esc(t.name)+'</span><span class="ct tnum">'+(mine.length+(cn?1:0))+'</span></div>';
+    h+='<ul>';
+    h+='<li class="caprow"><span class="n">C</span><span class="who">'+(cn?esc(cn):'<i>captain TBD</i>')+'</span></li>';
+    h+=mine.map(pk=>{const p=player(pk.playerId);
+        return '<li><span class="n tnum">'+pk.round+'.'+String(pk.n).padStart(2,"0")+'</span>'+
+               '<span class="who">'+esc(p?p.name:"?")+'</span></li>'}).join("");
+    h+='</ul>';
+    if(!mine.length) h+='<div class="none">No picks yet</div>';
+    d.innerHTML=h; wrap.appendChild(d);
+  });
+}
+
+function renderRoster(){
+  document.getElementById("inCount").textContent=inPool().length;
+  const CAPS=capIds();
+  const w=document.getElementById("rosterWarn");
+  w.className="card warnbox";
+  w.innerHTML='<b>Read before draft night.</b> Most nicknames give the person away, so nicknames are hidden by default, and a few answers self-identify too. '+
+    '<b>Abigail Brumbeloe is the only person who never responded</b> and is out of the pool. '+
+    '<b>Four said not sure and are being drafted anyway</b> (Brandon Dowdell, Julia McDonald, Kelsie Laughlin, Ryan Mickley). '+
+    'Kelsie Laughlin filed as Kelsie Milliken and Camryn Skladany is Camryn Mastel, both merged. Cherie Huey and Trevor Lowe are not in the People DB.';
+  if(presenting){
+    w.className="card warnbox";
+    w.innerHTML='<b>Presenting is on.</b> Names, nicknames and offices are hidden on this tab and on the Cards tab '+
+      'so a screen share cannot spoil the draft. Turn Presenting off when you are done to get the key back.';
+  }
+  const S1={in:"In",maybe:"Not sure",out:"Out",noreply:"No reply"};
+  const d=drafted(), body=document.getElementById("rosterBody"); body.innerHTML="";
+  let rows=[...S.roster];
+  if(rFilter==="in") rows=rows.filter(p=>p.status==="in");
+  if(rFilter==="no") rows=rows.filter(p=>!p.responded);
+  rows.sort((a,b)=>a.card-b.card).forEach(p=>{
+    const pk=S.picks.find(x=>x.playerId===p.id);
+    const tr=document.createElement("tr");
+    tr.innerHTML='<td><input type="checkbox"'+(p.in?" checked":"")+((pk||CAPS.has(p.id))?" disabled":"")+'></td>'+
+      '<td class="tnum" style="font-family:var(--disp);font-size:16px;color:var(--green)">'+String(p.card).padStart(2,"0")+'</td>'+
+      (presenting
+        ?'<td class="masked">hidden</td><td class="masked">hidden</td><td class="masked">hidden</td>'
+        :'<td style="font-weight:600">'+esc(p.name)+'</td><td style="color:var(--muted)">'+esc(p.role)+'</td>'+
+         '<td style="color:var(--muted)">'+esc(p.office)+'</td>')+
+      '<td><span class="pill '+p.status+'">'+S1[p.status]+'</span></td>'+
+      '<td'+(presenting?' class="masked">hidden':' style="color:var(--muted)">'+esc(p.nick))+'</td>'+
+      '<td>'+(CAPS.has(p.id)?'<span class="pill in">Captain</span>':pk?'<span class="pill in">'+esc(team(pk.teamId).name.replace(/ Universitys?$/i,'').replace('Team ',''))+'</span>':'')+'</td>';
+    tr.firstChild.firstChild.onchange=e=>{p.in=e.target.checked;push();render()};
+    if(pk)tr.style.opacity=".7";
+    body.appendChild(tr);
+  });
+  [["fAll","all"],["fIn","in"],["fNo","no"]].forEach(([id,v])=>
+    document.getElementById(id).setAttribute("aria-pressed",rFilter===v));
+}
+
+function renderPrint(){
+  const g=document.getElementById("printGrid"); g.innerHTML="";
+  const list=inPool().sort((a,b)=>a.card-b.card);
+  document.getElementById("printNote").textContent=list.length+" cards"+((commish&&!presenting)?" · names included (key sheet)":" · no names");
+  list.forEach(p=>{
+    const c=document.createElement("div"); c.className="pc";
+    let h='<div class="hd"><span class="no">'+String(p.card).padStart(2,"0")+'</span>'+
+      (showNick&&p.nick?'<span class="nk">'+esc(p.nick)+'</span>':'')+'</div>';
+    let any=false;
+    FIELDS.forEach(([k,l])=>{if(!p[k])return;any=true;
+      h+='<div class="r"><b>'+l+'</b>'+esc(p[k].length>240?p[k].slice(0,237)+"...":p[k])+'</div>'});
+    if(!any)h+='<div class="r" style="color:var(--dim);font-style:italic">No form response. Blank card.</div>';
+    if(commish&&!presenting)h+='<div class="rev">'+esc(p.name)+(p.office?" · "+esc(p.office):"")+'</div>';
+    c.innerHTML=h; g.appendChild(c);
+  });
+}
+
+function renderSetup(){
+  const sel2=document.getElementById("cfgTeams");
+  if(!sel2.childElementCount)for(let i=2;i<=8;i++){const o=document.createElement("option");o.value=i;o.textContent=i+" teams";sel2.appendChild(o)}
+  sel2.value=S.teams.length;
+  document.getElementById("cfgClock").value=S.cfg.clockSec;
+  document.getElementById("cfgSnake").value=S.cfg.snake?"1":"0";
+  const n=inPool().length,T=S.teams.length;
+  document.getElementById("cfgRounds").value=T?Math.ceil(n/T)+" rounds · "+n+" cards · "+Math.floor(n/T)+"–"+Math.ceil(n/T)+" per team":"—";
+  const rows=document.getElementById("teamRows"); rows.innerHTML="";
+  S.cfg.order.forEach((tid,i)=>{
+    const t=team(tid); if(!t)return;
+    const r=document.createElement("div"); r.className="teamrow";
+    const taken=new Set(S.teams.filter(x=>x!==t).map(x=>x.captainId).filter(Boolean));
+    const opts=['<option value="">Captain not set</option>'].concat(
+      [...S.roster].sort((a,b)=>a.name.localeCompare(b.name))
+        .filter(p=>!taken.has(p.id))
+        .map(p=>'<option value="'+p.id+'"'+(p.id===t.captainId?' selected':'')+'>'+esc(p.name)+'</option>')).join('');
+    r.innerHTML='<div class="swatch"></div><input type="text" placeholder="Team name"><select>'+opts+'</select><div class="ord tnum">#'+(i+1)+'</div>';
+    r.children[0].style.background=t.color;
+    r.children[1].value=t.name;
+    r.children[1].disabled=r.children[2].disabled=!commish;
+    r.children[1].onchange=e=>{t.name=e.target.value;push();render()};
+    r.children[2].onchange=e=>{t.captainId=e.target.value;
+      S.picks=S.picks.filter(pk=>pk.playerId!==t.captainId);push();render()};
+    rows.appendChild(r);
+  });
+  ["cfgTeams","cfgClock","cfgSnake","btnShuffle","btnReset"].forEach(id=>{
+    const e=document.getElementById(id); if(e)e.disabled=!commish});
+}
+
+/* ---------- wiring ---------- */
+document.querySelectorAll("nav button").forEach(b=>b.onclick=()=>{
+  document.querySelectorAll("nav button").forEach(x=>x.setAttribute("aria-current",x===b));
+  document.querySelectorAll(".view").forEach(v=>v.classList.toggle("on",v.id==="v-"+b.dataset.v));
+});
+document.getElementById("commishBtn").onclick=e=>{
+  commish=!commish; e.currentTarget.setAttribute("aria-pressed",commish);
+  try{localStorage.setItem("ig-commish",commish?"1":"0")}catch(_){}
+  if(commish&&db&&ref)push();
+  render();
+};
+document.getElementById("presentBtn").onclick=e=>{
+  presenting=!presenting; e.currentTarget.setAttribute("aria-pressed",presenting);
+  try{localStorage.setItem("ig-present",presenting?"1":"0")}catch(_){}
+  if(presenting){showNick=false;document.getElementById("nickBtn").setAttribute("aria-pressed",false)}
+  render();
+};
+document.getElementById("nickBtn").onclick=e=>{
+  showNick=!showNick; e.currentTarget.setAttribute("aria-pressed",showNick);
+  try{localStorage.setItem("ig-nick",showNick?"1":"0")}catch(_){}
+  render();
+};
+document.getElementById("srch").oninput=e=>{filterQ=e.target.value;renderGrid()};
+document.querySelectorAll(".gbar .sz").forEach(b=>b.onclick=()=>{
+  document.querySelectorAll(".gbar .sz").forEach(x=>x.setAttribute("aria-pressed",x===b));
+  const tv=b.dataset.sz==="l", g=document.getElementById("grid");
+  g.style.setProperty("--tile",tv?"300px":"216px"); g.style.setProperty("--gap",tv?"14px":"11px");
+  g.style.setProperty("--nosz",tv?"42px":"30px"); g.style.setProperty("--t1sz",tv?"17px":"13px");
+  g.style.setProperty("--t2sz",tv?"14px":"11.5px"); g.style.setProperty("--whosz",tv?"25px":"19px");
+  g.style.setProperty("--lbsz",tv?"11px":"9px");
+  try{localStorage.setItem("ig-size",b.dataset.sz)}catch(_){}
+});
+document.getElementById("btnClock").onclick=()=>{
+  if(clockLeft()===0&&!S.clock.running){S.clock={running:false,endsAt:null,remaining:S.cfg.clockSec};push();render()}
+  else toggleClock()};
+document.getElementById("btnUndo").onclick=undo;
+[["fAll","all"],["fIn","in"],["fNo","no"]].forEach(([id,v])=>
+  document.getElementById(id).onclick=()=>{rFilter=v;renderRoster()});
+document.getElementById("cfgTeams").onchange=e=>{
+  const n=+e.target.value, old=S.teams;
+  S.teams=mkTeams(n).map((t,i)=>old[i]?{...t,name:old[i].name,captainId:old[i].captainId}:t);
+  S.cfg.order=S.teams.map(t=>t.id); S.picks=[]; push(); render()};
+document.getElementById("cfgClock").onchange=e=>{
+  S.cfg.clockSec=Math.max(15,Math.min(600,+e.target.value||60));
+  if(!S.clock.running)S.clock.remaining=S.cfg.clockSec; push(); render()};
+document.getElementById("cfgSnake").onchange=e=>{S.cfg.snake=e.target.value==="1";push();render()};
+document.getElementById("btnShuffle").onclick=()=>{
+  if(S.picks.length&&!confirm("Reordering clears the picks already made. Continue?"))return;
+  const o=[...S.cfg.order];
+  for(let i=o.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[o[i],o[j]]=[o[j],o[i]]}
+  S.cfg.order=o;S.picks=[];push();render()};
+document.getElementById("btnReset").onclick=()=>{
+  if(!confirm("Clear every pick and put all the cards back on the board?"))return;
+  S.picks=[];S.clock={running:false,endsAt:null,remaining:S.cfg.clockSec};sel=null;push();render()};
+function rosterText(){
+  const L=["INNOVIEN GAMES 2026 — DRAFT RESULTS",new Date().toLocaleString(),""];
+  S.cfg.order.forEach(tid=>{const t=team(tid); if(!t)return;
+    L.push(t.name.toUpperCase()+(capName(t)?"  (Captain: "+capName(t)+")":""));
+    S.picks.filter(p=>p.teamId===tid).forEach(pk=>{const p=player(pk.playerId);
+      if(p)L.push("  "+pk.round+"."+String(pk.n).padStart(2,"0")+"  Card "+String(p.card).padStart(2,"0")+"  "+p.name+(p.office?" — "+p.office:""))});
+    L.push("")});
+  return L.join("\n")}
+document.getElementById("btnCopy").onclick=async e=>{
+  try{await navigator.clipboard.writeText(rosterText());e.target.textContent="Copied"}
+  catch(_){e.target.textContent="Copy failed"}
+  setTimeout(()=>e.target.textContent="Copy final rosters",1600)};
+document.getElementById("btnCsv").onclick=async e=>{
+  const rows=[["Team","Captain","Round","Pick","Card","Name","Role","Office"]];
+  S.cfg.order.forEach(tid=>{const t=team(tid);if(!t)return;
+    S.picks.filter(p=>p.teamId===tid).forEach(pk=>{const p=player(pk.playerId);if(!p)return;
+      rows.push([t.name,capName(t),pk.round,pk.n,p.card,p.name,p.role,p.office])})});
+  const csv=rows.map(r=>r.map(c=>'"'+String(c).replace(/"/g,'""')+'"').join(",")).join("\r\n");
+  const dl=(typeof claude!=="undefined"&&claude.use)?await claude.use("downloads").catch(()=>null):null;
+  if(dl){try{await dl.save({filename:"innovien-games-2026-teams.csv",data:csv});return}catch(_){}}
+  try{await navigator.clipboard.writeText(csv);e.target.textContent="CSV copied"}catch(_){e.target.textContent="Unavailable"}
+  setTimeout(()=>e.target.textContent="Download CSV",1800)};
+
+/* ---------- captains ---------- */
+const dequote=s=>String(s||"").trim().replace(/^["\u201C\u2018\u0027]+|["\u201D\u2019\u0027]+$/g,"").trim();
+const CAPROWS=[["dominate","Would dominate"],["liability","Liability in"],
+  ["competitive","Competitive about"],["fact1","Random fact"],["song","Walk-up song"]];
+
+function renderCaptains(){
+  const g=document.getElementById("capGrid"); if(!g)return;
+  g.innerHTML="";
+  S.cfg.order.forEach(tid=>{
+    const t=team(tid); if(!t)return;
+    const p=t.captainId?player(t.captainId):null;
+    const d=document.createElement("div"); d.className="capcard"; d.style.setProperty("--tc",t.color);
+    if(!p){d.innerHTML='<div class="tmlbl">'+esc(t.name)+'</div><div class="miss">Captain not set.</div>';g.appendChild(d);return}
+    let h2='<div class="top"><div><div class="tmlbl">'+esc(t.name)+'</div><div class="nm">'+esc(p.name)+'</div></div>'+
+      (p.nick?'<div class="nk">'+esc(p.nick)+'</div>':'')+'</div>';
+    const q=dequote(p.trash||p.scout);
+    if(q) h2+='<div class="quote">&ldquo;'+esc(q)+'&rdquo;</div>';
+    h2+='<div class="rows">';
+    let any=false;
+    CAPROWS.forEach(([k,l])=>{if(!p[k])return;any=true;
+      h2+='<div class="r"><b>'+l+'</b>'+esc(p[k].length>150?p[k].slice(0,147)+"...":p[k])+'</div>'});
+    if(!any&&!q) h2+='<div class="miss">No form response yet.</div>';
+    h2+='</div>';
+    d.innerHTML=h2; g.appendChild(d);
+  });
+}
+
+let prIdx=0;
+function presentAt(i){
+  const ids=S.cfg.order.filter(tid=>{const t=team(tid);return t&&t.captainId});
+  if(!ids.length)return;
+  prIdx=(i+ids.length)%ids.length;
+  const t=team(ids[prIdx]), p=player(t.captainId);
+  const pr=document.getElementById("pres");
+  const tm=document.getElementById("prTeam"); tm.textContent=t.name; tm.style.color=t.color;
+  const nm=document.getElementById("prName"); nm.textContent=p.name; nm.style.color=t.color;
+  document.getElementById("prNick").textContent=p.nick||"";
+  const q=dequote(p.trash||p.scout);
+  const qe=document.getElementById("prQuote");
+  qe.textContent=q?"\u201C"+q+"\u201D":""; qe.style.borderColor=t.color;
+  const rows=document.getElementById("prRows"); rows.innerHTML="";
+  CAPROWS.forEach(([k,l])=>{if(!p[k])return;
+    const d=document.createElement("div"); d.className="r";
+    d.innerHTML='<b></b>'; d.querySelector("b").textContent=l;
+    d.appendChild(document.createTextNode(p[k].length>170?p[k].slice(0,167)+"...":p[k]));
+    rows.appendChild(d)});
+  const dots=document.getElementById("prDots"); dots.innerHTML="";
+  ids.forEach((_,j)=>{const i2=document.createElement("i");if(j===prIdx)i2.className="on";
+    i2.style.background=j===prIdx?t.color:"";dots.appendChild(i2)});
+  pr.classList.add("on");
+  document.getElementById("prNext").textContent = prIdx===ids.length-1?"Done":"Next";
+}
+document.getElementById("btnPresent").onclick=()=>presentAt(0);
+document.getElementById("prNext").onclick=()=>{
+  const n=S.cfg.order.filter(tid=>{const t=team(tid);return t&&t.captainId}).length;
+  if(prIdx>=n-1)document.getElementById("pres").classList.remove("on"); else presentAt(prIdx+1)};
+document.getElementById("prPrev").onclick=()=>presentAt(prIdx-1);
+document.getElementById("prClose").onclick=()=>document.getElementById("pres").classList.remove("on");
+document.addEventListener("keydown",e=>{
+  const pr=document.getElementById("pres");
+  if(!pr.classList.contains("on"))return;
+  if(e.key==="Escape")pr.classList.remove("on");
+  if(e.key==="ArrowRight")document.getElementById("prNext").click();
+  if(e.key==="ArrowLeft")presentAt(prIdx-1);
+});
+
+/* ---------- boot ---------- */
+(function(){
+  const l=loadLocal(); if(l)S=l;
+  syncRoster();
+  try{commish=localStorage.getItem("ig-commish")==="1";showNick=localStorage.getItem("ig-nick")==="1";
+    presenting=localStorage.getItem("ig-present")==="1"}catch(_){}
+  if(presenting)showNick=false;
+  document.getElementById("commishBtn").setAttribute("aria-pressed",commish);
+  document.getElementById("nickBtn").setAttribute("aria-pressed",showNick);
+  document.getElementById("presentBtn").setAttribute("aria-pressed",presenting);
+  try{const z=localStorage.getItem("ig-size");
+    if(z)document.querySelector('.gbar .sz[data-sz="'+z+'"]').click()}catch(_){}
+  setSync("local","local");
+  render();
+  setInterval(()=>{if(S.clock.running)renderStrip()},250);
+})();
+(typeof claude!=="undefined"&&claude.use?claude.use("db"):Promise.resolve(null)).then(d=>{
+  if(!d){setSync("local","local");return}
+  db=d; ref=db.doc("draft/state3"); setSync("live","live");
+  ref.onSnapshot(s=>{
+    if(!s.exists){if(commish)push();return}
+    const r=s.data();
+    if(r&&r.v===3&&(r.updatedAt||0)>(S.updatedAt||0)){S=r;const ch=syncRoster();saveLocal();render();if(ch&&commish)push()}
+  },err=>setSync("local",err.code==="revoked"?"offline":"local"));
+}).catch(()=>setSync("local","local"));
+</script>
+</body>
+</html>
