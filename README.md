@@ -76,6 +76,11 @@ switch tabs.
 5. **Setup → Reset draft** as the last thing before the room fills
 6. Share the browser window over Teams, not the whole desktop
 
+**If a captain is missing**, hit **Random pick** in the top strip when their team is on the
+clock. It draws a random available card, opens it the same way, and badges the card and the
+reveal as Random so the room can see nobody chose it. Nothing is automatic, it only fires
+when you press it.
+
 A captain calls a number, you click that tile, the full card opens, you read it out,
 **Reveal the pick** drops the name in the team colour, **Next pick** returns to the wall.
 
